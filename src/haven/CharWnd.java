@@ -31,6 +31,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.font.TextAttribute;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static haven.Window.wbox;
 import static haven.PUtils.*;
@@ -52,6 +53,7 @@ public class CharWnd extends Window {
     public final Constipations cons;
     public final SkillList csk, nsk;
     public final ExperienceList exps;
+    public static boolean firstexpsmessagereceived;
     public final Widget woundbox;
     public final WoundList wounds;
     public Wound.Info wound;
@@ -783,7 +785,7 @@ public class CharWnd extends Window {
         private final Text.UText<?> rnm = new Text.UText<String>(attrf) {
             public String value() {
                 try {
-                    return (res.get().layer(Resource.tooltip).t);
+                    return (res.get().layer(Resource.tooltip).t + " (" + getinfoaboutlastobtainedtime() + " ago)");
                 } catch (Loading l) {
                     return ("...");
                 }
@@ -803,8 +805,35 @@ public class CharWnd extends Window {
             buf.append("$b{$font[serif,16]{" + res.layer(Resource.tooltip).t + "}}\n\n\n");
             if (score > 0)
                 buf.append("Experience points: " + Utils.thformat(score) + "\n\n");
-            buf.append(res.layer(Resource.pagina).text);
+            buf.append(res.layer(Resource.pagina).text + "\n\n");
+            buf.append("Received: " + getinfoaboutlastobtainedtime() + " ago");
             return (buf.toString());
+        }
+
+        private String getinfoaboutlastobtainedtime() {
+            String charname = gameui().buddies.getCharName();
+            if (charname == null || charname.isEmpty()) {
+                return "?";
+            }
+
+            String lasttimeoption = charname + ".lore." + res.get().name;
+            int lastobtainedtime = Utils.getprefi(lasttimeoption, 0);
+            if (lastobtainedtime == 0) {
+                return "?";
+            }
+
+            Date prev = new Date((long) lastobtainedtime * 1000);
+            Date now = new Date(System.currentTimeMillis());
+
+            long daysdelta = getdatesdiff(prev, now, TimeUnit.DAYS);
+            long hoursdelta = getdatesdiff(prev, now, TimeUnit.HOURS);
+
+            return String.format("%dd %dh", daysdelta, hoursdelta);
+        }
+
+        private long getdatesdiff(Date date1, Date date2, TimeUnit timeUnit) {
+            long diffinmillies = date2.getTime() - date1.getTime();
+            return timeUnit.convert(diffinmillies, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -1016,8 +1045,34 @@ public class CharWnd extends Window {
             sb.val = 0;
             sb.max = exps.length - h;
             sel = null;
+
+            if (firstexpsmessagereceived) {
+                String charname = gameui().buddies.getCharName();
+                if (charname != null && !charname.isEmpty()) {
+                    for (Experience newexp : exps) {
+                        String lasttimeoption = charname + ".lore." + newexp.res.get().name;
+
+                        boolean newlore = true;
+                        for (Experience prevexp : this.exps) {
+                            if (prevexp.res.get().name.equals(newexp.res.get().name)) {
+                                if (prevexp.mtime != newexp.mtime) {
+                                    Utils.setprefi(lasttimeoption, (int) (System.currentTimeMillis() / 1000L));
+                                }
+                                newlore = false;
+                                break;
+                            }
+                        }
+
+                        if (newlore) {
+                            Utils.setprefi(lasttimeoption, (int) (System.currentTimeMillis() / 1000L));
+                        }
+                    }
+                }
+            }
+
             this.exps = exps;
             loading = true;
+            firstexpsmessagereceived = true;
         }
     }
 
@@ -1138,6 +1193,8 @@ public class CharWnd extends Window {
 
     public CharWnd(Glob glob) {
         super(new Coord(300, 290), "Character Sheet");
+
+        firstexpsmessagereceived = false;
 
         final Tabs tabs = new Tabs(new Coord(15, 10), Coord.z, this);
         Tabs.Tab battr;
