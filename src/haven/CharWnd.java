@@ -53,7 +53,6 @@ public class CharWnd extends Window {
     public final Constipations cons;
     public final SkillList csk, nsk;
     public final ExperienceList exps;
-    public static boolean firstexpsmessagereceived;
     public final Widget woundbox;
     public final WoundList wounds;
     public Wound.Info wound;
@@ -785,7 +784,7 @@ public class CharWnd extends Window {
         private final Text.UText<?> rnm = new Text.UText<String>(attrf) {
             public String value() {
                 try {
-                    return (res.get().layer(Resource.tooltip).t + " (" + getinfoaboutlastobtainedtime() + " ago)");
+                    return (res.get().layer(Resource.tooltip).t);
                 } catch (Loading l) {
                     return ("...");
                 }
@@ -806,34 +805,7 @@ public class CharWnd extends Window {
             if (score > 0)
                 buf.append("Experience points: " + Utils.thformat(score) + "\n\n");
             buf.append(res.layer(Resource.pagina).text + "\n\n");
-            buf.append("Received: " + getinfoaboutlastobtainedtime() + " ago");
             return (buf.toString());
-        }
-
-        private String getinfoaboutlastobtainedtime() {
-            String charname = gameui().buddies.getCharName();
-            if (charname == null || charname.isEmpty()) {
-                return "?";
-            }
-
-            String lasttimeoption = charname + ".lore." + res.get().name;
-            int lastobtainedtime = Utils.getprefi(lasttimeoption, 0);
-            if (lastobtainedtime == 0) {
-                return "?";
-            }
-
-            Date prev = new Date((long) lastobtainedtime * 1000);
-            Date now = new Date(System.currentTimeMillis());
-
-            long daysdelta = getdatesdiff(prev, now, TimeUnit.DAYS);
-            long hoursdelta = getdatesdiff(prev, now, TimeUnit.HOURS);
-
-            return String.format("%dd %dh", daysdelta, hoursdelta);
-        }
-
-        private long getdatesdiff(Date date1, Date date2, TimeUnit timeUnit) {
-            long diffinmillies = date2.getTime() - date1.getTime();
-            return timeUnit.convert(diffinmillies, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -992,7 +964,11 @@ public class CharWnd extends Window {
         private boolean loading = false;
         private final Comparator<Experience> comp = new Comparator<Experience>() {
             public int compare(Experience a, Experience b) {
-                return (a.sortkey.compareTo(b.sortkey));
+                if (Config.sortloresbylastobtainedtime) {
+                    return (Integer.compare(a.mtime, b.mtime));
+                } else {
+                    return (a.sortkey.compareTo(b.sortkey));
+                }
             }
         };
 
@@ -1011,8 +987,12 @@ public class CharWnd extends Window {
                         loading = true;
                     }
                 }
-                Arrays.sort(exps, comp);
+                sort();
             }
+        }
+
+        public void sort() {
+            Arrays.sort(exps, comp);
         }
 
         protected Experience listitem(int idx) {
@@ -1045,34 +1025,8 @@ public class CharWnd extends Window {
             sb.val = 0;
             sb.max = exps.length - h;
             sel = null;
-
-            if (firstexpsmessagereceived) {
-                String charname = gameui().buddies.getCharName();
-                if (charname != null && !charname.isEmpty()) {
-                    for (Experience newexp : exps) {
-                        String lasttimeoption = charname + ".lore." + newexp.res.get().name;
-
-                        boolean newlore = true;
-                        for (Experience prevexp : this.exps) {
-                            if (prevexp.res.get().name.equals(newexp.res.get().name)) {
-                                if (prevexp.mtime != newexp.mtime) {
-                                    Utils.setprefi(lasttimeoption, (int) (System.currentTimeMillis() / 1000L));
-                                }
-                                newlore = false;
-                                break;
-                            }
-                        }
-
-                        if (newlore) {
-                            Utils.setprefi(lasttimeoption, (int) (System.currentTimeMillis() / 1000L));
-                        }
-                    }
-                }
-            }
-
             this.exps = exps;
             loading = true;
-            firstexpsmessagereceived = true;
         }
     }
 
@@ -1193,8 +1147,6 @@ public class CharWnd extends Window {
 
     public CharWnd(Glob glob) {
         super(new Coord(300, 290), "Character Sheet");
-
-        firstexpsmessagereceived = false;
 
         final Tabs tabs = new Tabs(new Coord(15, 10), Coord.z, this);
         Tabs.Tab battr;
