@@ -1051,6 +1051,32 @@ public class OptWnd extends Window {
                 a = val;
             }
         }, new Coord(0, y));
+        y += 35;
+        general.add(new CheckBox("Translate all incoming messages to") {
+            {
+                a = Config.translateincomingmessages;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("translateincomingmessages", val);
+                Config.translateincomingmessages = val;
+                a = val;
+            }
+        }, new Coord(0, y));
+        y += 20;
+        general.add(new Label("en"), new Coord(0, y));
+        general.add(new Label("ru"), new Coord(190, y));
+        y += 15;
+        general.add(new HSlider(200, 0, 1, 0) {
+            protected void attach(UI ui) {
+                super.attach(ui);
+                val = Config.translatelanguage;
+            }
+            public void changed() {
+                Config.translatelanguage = val;
+                Utils.setprefi("translatelanguage", val);
+            }
+        }, new Coord(0, y));
 
         general.add(new PButton(200, "Back", 27, main), new Coord(270, 360));
         general.pack();

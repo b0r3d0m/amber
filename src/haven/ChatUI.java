@@ -96,6 +96,28 @@ public class ChatUI extends Widget {
         resize(this.sz);
     }
 
+    private static String translatemessage(String msg) {
+        String res = msg;
+
+        if (!Config.translateincomingmessages) {
+            return res;
+        }
+
+        String translatedmsg = Translator.translate(
+            msg,
+            Config.translatelanguage == 0 ? Translator.Language.ENGLISH.toString() : Translator.Language.RUSSIAN.toString()
+        );
+        if (translatedmsg.isEmpty()) {
+            res += " (unable to translate)";
+        } else {
+            if (!msg.equals(translatedmsg)) {
+                res = translatedmsg + " (original message: \"" + msg + "\")";
+            }
+        }
+
+        return res;
+    }
+
     public static class ChatAttribute extends Attribute {
         private ChatAttribute(String name) {
             super(name);
@@ -907,6 +929,7 @@ public class ChatUI extends Widget {
                     append(my);
                     save(my.text().text, super.getparent(GameUI.class).buddies.getCharName());
                 } else {
+                    line = translatemessage(line);
                     Message cmsg = new NamedMessage(from, line, fromcolor(from), iw());
                     append(cmsg);
                     if (urgency > 0)
@@ -945,6 +968,7 @@ public class ChatUI extends Widget {
                     append(my);
                     save(my.text().text, super.getparent(GameUI.class).buddies.getCharName());
                 } else {
+                    line = translatemessage(line);
                     Message cmsg = new NamedMessage(from, line, Utils.blendcol(col, Color.WHITE, 0.5), iw());
                     append(cmsg);
                     if (urgency > 0)
@@ -982,6 +1006,7 @@ public class ChatUI extends Widget {
                 String t = (String) args[0];
                 String line = (String) args[1];
                 if (t.equals("in")) {
+                    line = translatemessage(line);
                     Message cmsg = new InMessage(line, iw());
                     append(cmsg);
                     notify(cmsg, 3);
