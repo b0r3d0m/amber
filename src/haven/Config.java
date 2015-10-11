@@ -117,6 +117,7 @@ public class Config {
     public static boolean alwaysrun = Utils.getprefb("alwaysrun", false);
     public static boolean autothrowleeches = Utils.getprefb("autothrowleeches", false);
     public static boolean sortloresbylastobtainedtime = Utils.getprefb("sortloresbylastobtainedtime", false);
+    public static boolean autoharvest = Utils.getprefb("autoharvest", false);
     public static Coord chatsz = Utils.getprefc("chatsz", Coord.z);
     public static boolean alternmapctrls = Utils.getprefb("alternmapctrls", false);
     public static boolean autostudy = Utils.getprefb("autostudy", true);

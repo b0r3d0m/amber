@@ -569,14 +569,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
     void addgob(RenderList rl, final Gob gob) {
         try {
             Resource res = gob.getres();
-
             if (Config.hidecrops && res != null) {
-                if (res.name.contains("/plants/") && !res.name.equals("gfx/terobjs/plants/trellis")) {
+                if (res.name.startsWith("gfx/terobjs/plants") && !res.name.equals("gfx/terobjs/plants/trellis")) {
                     return;
                 }
             }
         } catch (Loading le) {
-            return;
         }
 
         GLState xf;
@@ -600,7 +598,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
         try {
             Resource res = gob.getres();
-
             if (res != null && radmap.containsKey(res.name)) {
                 Gob.Overlay rovl = radmap.get(res.name);
                 if (Config.showterobjsrad) {
