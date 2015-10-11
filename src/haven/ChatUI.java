@@ -737,6 +737,7 @@ public class ChatUI extends Widget {
                 if (!irchelper.isconnected()) {
                     printinfo("Connecting...");
                     try {
+                        irchelper.setVerbose(true);
                         irchelper.connect(server);
                         irchelper.joinChannel(channel);
                     } catch (Exception ex) {
