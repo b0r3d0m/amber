@@ -275,7 +275,8 @@ public class OptWnd extends Window {
                         }
 
                         void dpy() {
-                            dpy.settext(String.format("%d", val));
+                            // Reserve some space for all numbers so pack method won't cut the required space
+                            dpy.settext(String.format("%d  ", val));
                         }
 
                         public void changed() {
@@ -295,7 +296,8 @@ public class OptWnd extends Window {
                         }
 
                         void dpy() {
-                            dpy.settext(String.format("%d", val));
+                            // Reserve some space for all numbers so pack method won't cut the required space
+                            dpy.settext(String.format("%d  ", val));
                         }
 
                         public void changed() {
