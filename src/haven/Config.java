@@ -94,6 +94,7 @@ public class Config {
     public static double studyalarmvol = Utils.getprefd("studyalarmvol", 0.8);
     public static double sfxchipvol = Utils.getprefd("sfxchipvol", 1.0);
     public static double sfxsqueakvol = Utils.getprefd("sfxsqueakvol", 1.0);
+    public static double sfxquernvol = Utils.getprefd("sfxquernvol", 1.0);
     public static boolean showcraftcap = Utils.getprefb("showcraftcap", false);
     public static boolean showgobhp = Utils.getprefb("showgobhp", false);
     public static boolean showplantgrowstage = Utils.getprefb("showplantgrowstage", false);
@@ -112,11 +113,8 @@ public class Config {
     public static boolean showanimalpaths = Utils.getprefb("showanimalpaths", false);
     public static boolean showstudylefttime = Utils.getprefb("showstudylefttime", false);
     public static boolean showinvonlogin = Utils.getprefb("showinvonlogin", false);
-    public static boolean showequiponlogin = Utils.getprefb("showequiponlogin", false);
-    public static boolean showchrsheetonlogin = Utils.getprefb("showchrsheetonlogin", false);
     public static boolean autopick = Utils.getprefb("autopick", false);
     public static boolean runonlogin = Utils.getprefb("runonlogin", false);
-    public static boolean alwaysrun = Utils.getprefb("alwaysrun", false);
     public static boolean autothrowleeches = Utils.getprefb("autothrowleeches", false);
     public static boolean sortloresbylastobtainedtime = Utils.getprefb("sortloresbylastobtainedtime", false);
     public static boolean autoharvest = Utils.getprefb("autoharvest", false);
@@ -125,6 +123,8 @@ public class Config {
     public static Coord chatsz = Utils.getprefc("chatsz", Coord.z);
     public static boolean alternmapctrls = Utils.getprefb("alternmapctrls", false);
     public static boolean autostudy = Utils.getprefb("autostudy", true);
+    public static boolean showcontentsbars = Utils.getprefb("showcontentsbars", false);
+    public static boolean dropseeds = Utils.getprefb("dropseeds", false);
     public static boolean hwcursor = false;
     public static byte[] authck = null;
     public static String prefspec = "hafen";
