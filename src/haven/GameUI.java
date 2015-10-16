@@ -144,6 +144,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         buffs = ulpanel.add(new Bufflist(), new Coord(95, 65));
         syslog = chat.add(new ChatUI.Log("System"));
         globalchat = chat.add(new ChatUI.GlobalChat(StatusWdg.username));
+        chat.select(syslog);
         opts = add(new OptWnd());
         opts.hide();
         zerg = add(new Zergwnd(), 187, 50);
@@ -522,7 +523,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             zerg.ntab(polity = (Polity) child, zerg.pol);
             zerg.pol.tooltip = Text.render(polity.cap);
         } else if (place == "chat") {
+            ChatUI.Channel prevchannel = chat.sel;
             chat.addchild(child);
+            if (Config.selectsyslogonlogin && prevchannel != null && chat.sel.cb == null) {
+                 chat.select(prevchannel);
+            }
         } else if (place == "party") {
             add(child, 10, 95);
         } else if (place == "meter") {

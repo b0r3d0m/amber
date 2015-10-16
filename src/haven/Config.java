@@ -113,6 +113,7 @@ public class Config {
     public static boolean showanimalpaths = Utils.getprefb("showanimalpaths", false);
     public static boolean showstudylefttime = Utils.getprefb("showstudylefttime", false);
     public static boolean showinvonlogin = Utils.getprefb("showinvonlogin", false);
+    public static boolean selectsyslogonlogin = Utils.getprefb("selectsyslogonlogin", false);
     public static boolean autopick = Utils.getprefb("autopick", false);
     public static boolean runonlogin = Utils.getprefb("runonlogin", false);
     public static boolean autothrowleeches = Utils.getprefb("autothrowleeches", false);

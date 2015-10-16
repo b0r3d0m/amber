@@ -810,6 +810,20 @@ public class OptWnd extends Window {
             }
         }, new Coord(260, y));
 
+        // -------------------------------------------- display 3rd column
+        y  = 0;
+        display.add(new CheckBox("Select syslog on login") {
+            {
+                a = Config.selectsyslogonlogin;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("selectsyslogonlogin", val);
+                Config.selectsyslogonlogin = val;
+                a = val;
+            }
+        }, new Coord(540, y));
+
         display.add(new Button(220, "Reset Windows (req. logout)") {
             @Override
             public void click() {
