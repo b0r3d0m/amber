@@ -26,6 +26,12 @@
 
 package haven;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -60,6 +66,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public ChatUI chat;
     public ChatUI.Channel syslog;
     public ChatUI.Channel globalchat;
+    public ChatUI.Channel tradechannel;
     public double prog = -1;
     private boolean afk = false;
     @SuppressWarnings("unchecked")
@@ -72,6 +79,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public QuickSlotsWdg quickslots;
     public StatusWdg statuswindow;
     private boolean updhanddestroyed = false;
+    private static ThreadGroup tg = new ThreadGroup("TradesUpdaterThreadGroup");
+    private static final String tradesupdaterthreadname = "TradesUpdater";
 
     public abstract class Belt extends Widget {
         public Belt(Coord sz) {
@@ -144,6 +153,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         buffs = ulpanel.add(new Bufflist(), new Coord(95, 65));
         syslog = chat.add(new ChatUI.Log("System"));
         globalchat = chat.add(new ChatUI.GlobalChat(StatusWdg.username));
+        tradechannel = chat.add(new ChatUI.Log("Trade"));
         chat.select(syslog);
         opts = add(new OptWnd());
         opts.hide();
@@ -163,6 +173,74 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         if (!Config.statuswdgvisible)
             statuswindow.hide();
         add(statuswindow, new Coord(HavenPanel.w / 2, 5));
+
+        tg.interrupt();
+        starttradesupdaterthread();
+    }
+
+    private void starttradesupdaterthread() {
+        Thread tradesupdaterthread = new Thread(tg, new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        updatetrades();
+                        Thread.sleep(10 * 60 * 1000); // 10 mins
+                    } catch (InterruptedException ie) {
+                        return;
+                    }
+                }
+            }
+        });
+        tradesupdaterthread.start();
+    }
+
+    private void updatetrades() throws InterruptedException {
+        synchronized (GameUI.class) {
+            final int CONN_RETRIES = 6;
+
+            Document doc = null;
+            for (int i = 0; i < CONN_RETRIES; i++) {
+                try {
+                    String applefororangesurl = "http://www.havenandhearth.com/forum/viewforum.php?f=44";
+                    doc = Jsoup.connect(applefororangesurl).get();
+                    break;
+                } catch (IOException ioe) {
+                    // Give some time to fix possible internet connection's errors
+                    Thread.sleep(300);
+                }
+            }
+
+            List<String> msgs = new LinkedList<String>();
+            if (doc != null) {
+                try {
+                    Element topiclist = doc.getElementsByClass("topics-proper").get(1); // First element is related to announcements, so let's skip it
+                    Elements topics = topiclist.getElementsByClass("topictitle");
+                    for (int i = topics.size() - 1; i >= 0; --i) {
+                        try {
+                            Element topic = topics.get(i);
+
+                            String title = topic.text();
+                            String href = topic.attr("href");
+                            String fullurl = String.format("http://www.havenandhearth.com/forum%s", href.substring(1)); // Remove first dot character (./viewtopic.php...)
+
+                            msgs.add(String.format("%s: %s", title, fullurl));
+                        } catch (Exception ex) {
+                            continue;
+                        }
+                    }
+                } catch (Exception ex) {
+                    // Invalid page received
+                    return;
+                }
+            }
+
+            if (!msgs.isEmpty()) {
+                tradechannel.clear();
+                for (String msg : msgs) {
+                    tradechannel.append(msg, Color.WHITE);
+                }
+            }
+        }
     }
 
     /* Ice cream */
