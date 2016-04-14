@@ -62,28 +62,24 @@ public class LoginScreen extends Widget {
         GameUI.trackon = false;
         GameUI.crimeon = false;
 
-        new Timer().schedule(
-            new TimerTask() {
-                @Override
-                public void run() {
-                    try {
+        if (GameUI.eval.isValid) {
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
 
-                        Evaluator eval = new Evaluator("script.js");
-
-                        Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) eval.call("onLogin");
+                        Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) GameUI.eval.call("onLogin");
                         String login = (String) Utils.getEntryValue(credentials, "login");
                         String password = (String) Utils.getEntryValue(credentials, "password");
 
                         cur = new Credentials(login, password);
                         wdgmsg("login", cur.data());
 
-                    } catch (IOException io) {
-                        io.printStackTrace();
                     }
-                }
-            },
-            100
-        );
+                },
+                100
+            );
+        }
     }
 
     private static abstract class Login extends Widget {

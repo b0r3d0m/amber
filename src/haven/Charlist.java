@@ -61,25 +61,21 @@ public class Charlist extends Widget {
         y = 0;
         setcanfocus(true);
 
-        new Timer().schedule(
-            new TimerTask() {
-                @Override
-                public void run() {
-                    try {
+        if (GameUI.eval.isValid) {
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
 
-                        Evaluator eval = new Evaluator("script.js");
-
-                        String charName = (String) eval.call("onCharSelect");
+                        String charName = (String) GameUI.eval.call("onCharSelect");
 
                         wdgmsg("play", charName);
 
-                    } catch (IOException io) {
-                        io.printStackTrace();
                     }
-                }
-            },
-            3000
-        );
+                },
+                3000
+            );
+        }
 
     }
 

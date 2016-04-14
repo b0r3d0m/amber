@@ -6,13 +6,23 @@ import org.mozilla.javascript.*;
 
 public class Evaluator {
 
-    public Evaluator(String scriptPath) throws IOException {
+    public Evaluator(String scriptPath) {
 
-        cx = Context.enter();
-        scope = cx.initStandardObjects();
+        isValid = true;
 
-        FileReader fileReader = new FileReader(scriptPath);
-        cx.evaluateReader(scope, fileReader, scriptPath, 1, null);
+        try {
+
+            cx = Context.enter();
+            scope = cx.initStandardObjects();
+
+            FileReader fileReader = new FileReader(scriptPath);
+            cx.evaluateReader(scope, fileReader, scriptPath, 1, null);
+
+        } catch (IOException io) {
+
+            isValid = false;
+
+        }
 
     }
 
@@ -44,6 +54,8 @@ public class Evaluator {
         return call(functionName, null);
 
     }
+
+    public boolean isValid;
 
     private Context cx;
     private ScriptableObject scope;

@@ -82,6 +82,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private boolean trackautotgld = false;
     public FBelt fbelt;
     private ErrorSysMsgCallback errmsgcb;
+    public static Evaluator eval = new Evaluator("script.js");
 
     public abstract class Belt extends Widget {
         public Belt(Coord sz) {
