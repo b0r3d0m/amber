@@ -1,40 +1,23 @@
 package haven;
 
+import java.util.*;
+
 public class Game extends Widget {
 
     public boolean studyCurio(String curioName) {
 
-        Window invwnd = gameui().getwnd("Inventory");
+        Inventory charinvwdg = getCharInventoryWidget();
+        Inventory studyinvwdg = getStudyInventoryWidget();
 
-        Window charsheet = gameui().getwnd("Character Sheet");
-        Inventory studyinv = null;
-        for (Widget firstWdg = charsheet.lchild; firstWdg != null; firstWdg = firstWdg.prev) {
-            for (Widget secondWdg = firstWdg.lchild; secondWdg != null; secondWdg = secondWdg.prev) {
-                if (secondWdg instanceof Inventory && secondWdg.parent instanceof Tabs.Tab) {
-                    studyinv = (Inventory) secondWdg;
-                }
+        List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
+        for (WItem witm : charinvwitems) {
+            String witmbasename = getItemBaseName(witm);
+            if (witmbasename.equals(curioName)) {
+                witm.item.wdgmsg("take", witm.c);
+                // TODO: Drop an item to the empty space, not the top-left cell
+                studyinvwdg.drop(Coord.z, new Coord(0, 0));
+                return true;
             }
-        }
-
-        try {
-            for (Widget invwdg = invwnd.lchild; invwdg != null; invwdg = invwdg.prev) {
-                if (invwdg instanceof Inventory) {
-                    Inventory inv = (Inventory) invwdg;
-                    for (Widget witm = inv.lchild; witm != null; witm = witm.prev) {
-                        if (witm instanceof WItem) {
-                            GItem ngitm = ((WItem) witm).item;
-                            Resource nres = ngitm.resource();
-                            if (nres != null && nres.basename().equals(curioName)) {
-                                ngitm.wdgmsg("take", witm.c);
-                                studyinv.drop(Coord.z, new Coord(0, 0));
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                }
-            }
-        } catch (Exception e) { // ignored
         }
 
         return false;
@@ -53,6 +36,59 @@ public class Game extends Widget {
         gui.act("lo");
         if (gui != null & gui.map != null)
             gui.map.canceltasks();
+
+    }
+
+    private Inventory getCharInventoryWidget() {
+
+        Window invwnd = gameui().getwnd("Inventory");
+        for (Widget invwdg = invwnd.lchild; invwdg != null; invwdg = invwdg.prev) {
+            if (invwdg instanceof Inventory) {
+                return (Inventory) invwdg;
+            }
+        }
+
+        return null;
+
+    }
+
+    private Inventory getStudyInventoryWidget() {
+
+        Window charsheet = gameui().getwnd("Character Sheet");
+        for (Widget firstlvlwdg = charsheet.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
+            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
+                if (secondlvlwdg instanceof Inventory && secondlvlwdg.parent instanceof Tabs.Tab) {
+                    return (Inventory) secondlvlwdg;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    private List<WItem> getInventoryWItems(Inventory invwdg) {
+
+        List<WItem> witems = new ArrayList<WItem>();
+
+        for (Widget witm = invwdg.lchild; witm != null; witm = witm.prev) {
+            if (witm instanceof WItem) {
+                witems.add((WItem) witm);
+            }
+        }
+
+        return witems;
+
+    }
+
+    private String getItemBaseName(WItem witm) {
+
+        GItem ngitm = witm.item;
+        Resource nres = ngitm.resource();
+        if (nres == null) {
+            return null;
+        }
+        return nres.basename();
 
     }
 
