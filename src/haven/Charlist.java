@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.io.*;
 import java.util.*;
 
 public class Charlist extends Widget {
@@ -59,6 +60,27 @@ public class Charlist extends Widget {
         this.height = height;
         y = 0;
         setcanfocus(true);
+
+        new Timer().schedule(
+            new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+
+                        Evaluator eval = new Evaluator("script.js");
+
+                        String charName = (String) eval.call("onCharSelect");
+
+                        wdgmsg("play", charName);
+
+                    } catch (IOException io) {
+                        io.printStackTrace();
+                    }
+                }
+            },
+            3000
+        );
+
     }
 
     protected void added() {
