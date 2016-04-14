@@ -47,6 +47,20 @@ public class Utils {
     public static final java.awt.image.ColorModel rgbm = java.awt.image.ColorModel.getRGBdefault();
     private static Preferences prefs = null;
 
+    static public Object getEntryValue(Set<Map.Entry<String, Object>> entrySet, String entryName) throws NoSuchElementException {
+
+        for (Map.Entry<String, Object> entry : entrySet) {
+
+            if (entry.getKey().equals(entryName)) {
+                return entry.getValue();
+            }
+
+        }
+
+        throw new NoSuchElementException();
+
+    }
+
     static Coord imgsz(BufferedImage img) {
         return (new Coord(img.getWidth(), img.getHeight()));
     }

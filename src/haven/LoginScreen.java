@@ -30,6 +30,10 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 
+import java.io.*;
+import java.util.Map;
+import java.util.Set;
+
 public class LoginScreen extends Widget {
     Login cur;
     Text error;
@@ -58,12 +62,62 @@ public class LoginScreen extends Widget {
         GameUI.swimon = false;
         GameUI.trackon = false;
         GameUI.crimeon = false;
+
+        new Thread() {
+            public void run() {
+
+                try {
+                    sleep(100);
+                } catch (InterruptedException ie) {
+                    return;
+                }
+
+                try {
+
+                    Evaluator eval = new Evaluator("script.js");
+
+                    Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) eval.call("onLogin");
+                    String login = (String) Utils.getEntryValue(credentials, "login");
+                    String password = (String) Utils.getEntryValue(credentials, "password");
+
+                    cur = new Credentials(login, password);
+                    wdgmsg("login", cur.data());
+
+                } catch (IOException io) {
+                    io.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private static abstract class Login extends Widget {
         abstract Object[] data();
 
         abstract boolean enter();
+    }
+
+    private class Credentials extends Login {
+
+        String login;
+        String password;
+
+        public Credentials(String login, String password) {
+
+            this.login = login;
+            this.password = password;
+
+            LoginScreen.this.add(this);
+
+        }
+
+        Object[] data() {
+            return (new Object[]{new AuthClient.NativeCred(login, password), false});
+        }
+
+        boolean enter() {
+            return !login.isEmpty() && !password.isEmpty();
+        }
+
     }
 
     private class Pwbox extends Login {
