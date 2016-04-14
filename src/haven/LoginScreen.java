@@ -31,8 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class LoginScreen extends Widget {
     Login cur;
@@ -63,31 +62,28 @@ public class LoginScreen extends Widget {
         GameUI.trackon = false;
         GameUI.crimeon = false;
 
-        new Thread() {
-            public void run() {
+        new Timer().schedule(
+            new TimerTask() {
+                @Override
+                public void run() {
+                    try {
 
-                try {
-                    sleep(100);
-                } catch (InterruptedException ie) {
-                    return;
+                        Evaluator eval = new Evaluator("script.js");
+
+                        Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) eval.call("onLogin");
+                        String login = (String) Utils.getEntryValue(credentials, "login");
+                        String password = (String) Utils.getEntryValue(credentials, "password");
+
+                        cur = new Credentials(login, password);
+                        wdgmsg("login", cur.data());
+
+                    } catch (IOException io) {
+                        io.printStackTrace();
+                    }
                 }
-
-                try {
-
-                    Evaluator eval = new Evaluator("script.js");
-
-                    Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) eval.call("onLogin");
-                    String login = (String) Utils.getEntryValue(credentials, "login");
-                    String password = (String) Utils.getEntryValue(credentials, "password");
-
-                    cur = new Credentials(login, password);
-                    wdgmsg("login", cur.data());
-
-                } catch (IOException io) {
-                    io.printStackTrace();
-                }
-            }
-        }.start();
+            },
+            100
+        );
     }
 
     private static abstract class Login extends Widget {
