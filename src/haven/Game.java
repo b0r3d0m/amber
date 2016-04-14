@@ -24,6 +24,21 @@ public class Game extends Widget {
 
     }
 
+    public String[] getInvItems() {
+
+        List<String> invitems = new ArrayList<String>();
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
+        for (WItem witm : charinvwitems) {
+            String witmbasename = getItemBaseName(witm);
+            invitems.add(witmbasename);
+        }
+
+        return invitems.toArray(new String[invitems.size()]);
+
+    }
+
     public void quit() {
 
         System.exit(0);
