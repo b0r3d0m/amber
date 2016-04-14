@@ -83,6 +83,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public FBelt fbelt;
     private ErrorSysMsgCallback errmsgcb;
     public static Evaluator eval = new Evaluator("script.js");
+    public static Game game = new Game();
 
     public abstract class Belt extends Widget {
         public Belt(Coord sz) {
@@ -195,6 +196,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         add(fbelt, Utils.getprefc("fbelt_c", new Coord(20, 200)));
         if (!Config.fbelt)
             fbelt.hide();
+
+        add(game, new Coord(0, 0)); // TODO: Think about better way (not to add the Game widget on every game session)
     }
 
     /* Ice cream */

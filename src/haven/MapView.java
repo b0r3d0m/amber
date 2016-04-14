@@ -501,6 +501,20 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         this.gridol = new TileOutline(glob.map, MCache.cutsz.mul(2 * (view + 1)));
         this.partyHighlight = new PartyHighlight(glob.party, plgob);
         setcanfocus(true);
+
+        if (GameUI.eval.isValid) {
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        GameUI.eval.call("onGameLoaded", new Object[] { GameUI.game });
+
+                    }
+                },
+                10000
+            );
+        }
     }
 
     public boolean visol(int ol) {
