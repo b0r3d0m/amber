@@ -41,4 +41,19 @@ public class Game extends Widget {
 
     }
 
+    public void quit() {
+
+        System.exit(0);
+
+    }
+
+    public void logout() {
+
+        GameUI gui = gameui();
+        gui.act("lo");
+        if (gui != null & gui.map != null)
+            gui.map.canceltasks();
+
+    }
+
 }
