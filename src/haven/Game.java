@@ -62,6 +62,29 @@ public class Game extends Widget {
 
     }
 
+    public boolean pickItem(long id) {
+
+        Config.autopick = true;
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                if (gob.id == id) {
+
+                    GameUI gui = gameui();
+                    gui.map.pfRightClick(gob, -1, 3, 0, null);
+                    return true;
+
+                }
+
+            }
+        }
+
+        return false;
+
+    }
+
     public void quit() {
 
         System.exit(0);

@@ -34,7 +34,6 @@ import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 
 import static haven.Inventory.invsq;
-
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
     public static final Text.Foundry progressf = new Text.Foundry(Text.sansb, 12).aa(true);

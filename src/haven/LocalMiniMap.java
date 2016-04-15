@@ -295,13 +295,15 @@ public class LocalMiniMap extends Widget {
 
                     final String curioBaseName = res.basename();
                     if (CurioStudyTimes.curios.containsKey(curioBaseName)) {
-                        if (!evalgobs.contains(gob.id)) {
-                            evalgobs.add(gob.id);
+
+                        long gobId = gob.id;
+                        if (!evalgobs.contains(gobId)) {
+                            evalgobs.add(gobId);
 
                             Coord curioCoords = gob.rc;
 
                             GameUI.eval.addTaskToQueue(() -> {
-                                GameUI.eval.call("onCurioFound", new Object[] { curioBaseName, curioCoords });
+                                GameUI.eval.call("onCurioFound", new Object[] { gobId, curioBaseName, curioCoords });
                             });
 
                         }

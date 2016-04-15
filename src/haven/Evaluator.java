@@ -23,14 +23,14 @@ public class Evaluator {
 
             tickTimer = new Timer();
             tickTimer.scheduleAtFixedRate(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        addTaskToQueue(() -> {
-                            call("onTick");
-                        });
-                    }
-                }, 1000, 1000
+                    new TimerTask() {
+                        @Override
+                        public void run() {
+                            addTaskToQueue(() -> {
+                                call("onTick");
+                            });
+                        }
+                    }, 1000, 1000
             );
 
             while (true) {
