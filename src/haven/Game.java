@@ -8,6 +8,9 @@ public class Game extends Widget {
 
         Inventory charinvwdg = getCharInventoryWidget();
         Inventory studyinvwdg = getStudyInventoryWidget();
+        if (charinvwdg == null || studyinvwdg == null) {
+            return false;
+        }
 
         List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
         for (WItem witm : charinvwitems) {
@@ -29,6 +32,10 @@ public class Game extends Widget {
         List<String> invitems = new ArrayList<String>();
 
         Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
         List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
         for (WItem witm : charinvwitems) {
             String witmbasename = getItemBaseName(witm);
