@@ -103,7 +103,8 @@ public class Evaluator {
 
     protected void finalize() throws Throwable {
 
-        // TODO: interrupt and join evaluatorThread
+        evaluatorThread.interrupt();
+        evaluatorThread.join();
         Context.exit();
         super.finalize();
 
