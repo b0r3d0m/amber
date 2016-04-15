@@ -343,6 +343,19 @@ public class LocalMiniMap extends Widget {
                                 g.chcolor();
                             }
 
+                            long gobId = gob.id;
+                            if (!evalgobs.contains(gobId)) {
+                                evalgobs.add(gobId);
+
+                                boolean iskin = kininfo != null;
+                                Coord playerCoords = gob.rc;
+
+                                GameUI.eval.addTaskToQueue(() -> {
+                                    GameUI.eval.call("onPlayerFound", new Object[] { gobId, iskin, playerCoords });
+                                });
+
+                            }
+
                             if ((Config.alarmunknown || Config.autohearth) && kininfo == null) {
                                 if (!sgobs.contains(gob.id)) {
                                     sgobs.add(gob.id);
