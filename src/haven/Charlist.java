@@ -61,7 +61,7 @@ public class Charlist extends Widget {
         y = 0;
         setcanfocus(true);
 
-        GameUI.eval.runDelayedTask(() -> {
+        GameUI.eval.addDelayedTask(() -> {
             String charName = (String) GameUI.eval.call("onCharSelect");
 
             wdgmsg("play", charName);

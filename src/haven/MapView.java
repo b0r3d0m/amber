@@ -502,7 +502,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
         this.partyHighlight = new PartyHighlight(glob.party, plgob);
         setcanfocus(true);
 
-        GameUI.eval.runDelayedTask(() -> {
+        GameUI.eval.addDelayedTask(() -> {
             GameUI.eval.call("onGameLoaded", new Object[] { GameUI.game });
         }, 10000);
     }

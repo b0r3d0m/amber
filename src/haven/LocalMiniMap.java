@@ -63,6 +63,7 @@ public class LocalMiniMap extends Widget {
     private final static Tex treeicn = Text.renderstroked("\u25B2", Color.CYAN, Color.BLACK, bushf).tex();
     private Map<Color, Tex> xmap = new HashMap<Color, Tex>(6);
     public static Coord plcrel = null;
+    public final HashSet<Long> evalgobs = new HashSet<Long>();
 
     private static class MapTile {
         public MCache.Grid grid;
@@ -291,6 +292,20 @@ public class LocalMiniMap extends Widget {
                     Resource res = gob.getres();
                     if (res == null)
                         continue;
+
+                    final String curioBaseName = res.basename();
+                    if (CurioStudyTimes.curios.containsKey(curioBaseName)) {
+                        if (!evalgobs.contains(gob.id)) {
+                            evalgobs.add(gob.id);
+
+                            Coord curioCoords = gob.rc;
+
+                            GameUI.eval.addTaskToQueue(() -> {
+                                GameUI.eval.call("onCurioFound", new Object[] { curioBaseName, curioCoords });
+                            });
+
+                        }
+                    }
 
                     if ("body".equals(res.basename()) && gob.id != mv.player().id) {
                         boolean ispartymember = false;

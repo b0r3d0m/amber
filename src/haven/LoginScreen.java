@@ -62,7 +62,7 @@ public class LoginScreen extends Widget {
         GameUI.trackon = false;
         GameUI.crimeon = false;
 
-        GameUI.eval.runDelayedTask(() -> {
+        GameUI.eval.addDelayedTask(() -> {
 
             Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) GameUI.eval.call("onLogin");
             String login = (String) Utils.getEntryValue(credentials, "login");

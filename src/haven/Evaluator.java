@@ -21,6 +21,18 @@ public class Evaluator {
                 }
             }
 
+            tickTimer = new Timer();
+            tickTimer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        addTaskToQueue(() -> {
+                            call("onTick");
+                        });
+                    }
+                }, 1000, 1000
+            );
+
             while (true) {
 
                 try {
@@ -29,11 +41,12 @@ public class Evaluator {
                     return;
                 }
 
+                Runnable task = null;
                 synchronized (tasksSync) {
-                    Runnable task = tasks.poll();
-                    if (task != null) {
-                        task.run();
-                    }
+                    task = tasks.poll();
+                }
+                if (task != null) {
+                    task.run();
                 }
 
             }
@@ -67,7 +80,7 @@ public class Evaluator {
 
     }
 
-    public void runDelayedTask(Runnable task, long millisecsDelay) {
+    public void addDelayedTask(Runnable task, long millisecsDelay) {
 
         synchronized (isValidSync) {
             if (!isValid) {
@@ -81,13 +94,18 @@ public class Evaluator {
                 public void run() {
                     addTaskToQueue(task);
                 }
-            },
-            millisecsDelay
+            }, millisecsDelay
         );
 
     }
 
-    private void addTaskToQueue(Runnable task) {
+    public void addTaskToQueue(Runnable task) {
+
+        synchronized (isValidSync) {
+            if (!isValid) {
+                return;
+            }
+        }
 
         synchronized (tasksSync) {
             tasks.add(task);
@@ -133,8 +151,9 @@ public class Evaluator {
 
     private Thread evaluatorThread;
 
+    private Timer tickTimer;
+
     private Context cx;
     private ScriptableObject scope;
 
 }
-
