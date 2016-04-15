@@ -17,7 +17,8 @@ public class Game extends Widget {
             String witmbasename = getItemBaseName(witm);
             if (witmbasename.equals(curioName)) {
                 witm.item.wdgmsg("take", witm.c);
-                // TODO: Drop an item to the empty space, not the top-left cell
+                // TODO: Drop an item to the empty space, not to the top-left cell
+                // TODO: Handle "not enough study points" situation
                 studyinvwdg.drop(Coord.z, new Coord(0, 0));
                 return true;
             }
@@ -43,6 +44,21 @@ public class Game extends Widget {
         }
 
         return invitems.toArray(new String[invitems.size()]);
+
+    }
+
+    public Coord getPlayerCoords() {
+
+        GameUI gui = gameui();
+        Gob player = gui.map.player();
+        return player.rc;
+
+    }
+
+    public void goTo(int x, int y) {
+
+        GameUI gui = gameui();
+        gui.map.pfLeftClick(new Coord(x, y), null);
 
     }
 
