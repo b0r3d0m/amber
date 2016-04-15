@@ -85,6 +85,12 @@ public class Game extends Widget {
 
     }
 
+    public void travelToHearthFire() {
+
+        gameui().menu.wdgmsg("act", new Object[]{"travel", "hearth"});
+
+    }
+
     public void quit() {
 
         System.exit(0);
