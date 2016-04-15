@@ -293,8 +293,9 @@ public class LocalMiniMap extends Widget {
                     if (res == null)
                         continue;
 
-                    final String curioBaseName = res.basename();
-                    if (CurioStudyTimes.curios.containsKey(curioBaseName)) {
+                    final String resBaseName = res.basename();
+
+                    if (CurioStudyTimes.curios.containsKey(resBaseName)) {
 
                         long gobId = gob.id;
                         if (!evalgobs.contains(gobId)) {
@@ -303,10 +304,26 @@ public class LocalMiniMap extends Widget {
                             Coord curioCoords = gob.rc;
 
                             GameUI.eval.addTaskToQueue(() -> {
-                                GameUI.eval.call("onCurioFound", new Object[] { gobId, curioBaseName, curioCoords });
+                                GameUI.eval.call("onCurioFound", new Object[] { gobId, resBaseName, curioCoords });
                             });
 
                         }
+                    }
+
+                    if (res.name.startsWith("gfx/kritter/")) {
+
+                        long gobId = gob.id;
+                        if (!evalgobs.contains(gobId)) {
+                            evalgobs.add(gobId);
+
+                            Coord creatureCoords = gob.rc;
+
+                            GameUI.eval.addTaskToQueue(() -> {
+                                GameUI.eval.call("onCreatureFound", new Object[] { gobId, resBaseName, creatureCoords });
+                            });
+
+                        }
+
                     }
 
                     if ("body".equals(res.basename()) && gob.id != mv.player().id) {
