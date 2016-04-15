@@ -83,6 +83,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private ErrorSysMsgCallback errmsgcb;
     public static Evaluator eval = new Evaluator("script.js");
     public static Game game = new Game();
+    private boolean gameloadedcalled = false;
 
     public abstract class Belt extends Widget {
         public Belt(Coord sz) {
@@ -197,6 +198,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             fbelt.hide();
 
         add(game, new Coord(0, 0)); // TODO: Think about better way (not to add the Game widget on every game session)
+
+        if (!gameloadedcalled) {
+            GameUI.eval.addDelayedTask(() -> {
+                GameUI.eval.call("onGameLoaded", new Object[] { GameUI.game });
+            }, 10000);
+            gameloadedcalled = true;
+        }
     }
 
     /* Ice cream */
