@@ -207,6 +207,57 @@ public class Game extends Widget {
 
     }
 
+    public class AttentionInfo {
+
+        public AttentionInfo(int max, int used) {
+            this.max = max;
+            this.used = used;
+        }
+
+        public int max;
+        public int used;
+
+    }
+
+    private CharWnd.StudyInfo getStudyInfoWdg() {
+
+        Window charsheet = gameui().getwnd("Character Sheet");
+        for (Widget firstlvlwdg = charsheet.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
+            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
+                if (secondlvlwdg instanceof CharWnd.StudyInfo && secondlvlwdg.parent instanceof Tabs.Tab) {
+                    return (CharWnd.StudyInfo) secondlvlwdg;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    public AttentionInfo getCharAttentionInfo() {
+
+        CharWnd.StudyInfo studyInfoWdg = getStudyInfoWdg();
+        if (studyInfoWdg == null) {
+            return null;
+        }
+
+        int maxAttention = ui.sess.glob.cattr.get("int").comp;
+
+        int usedAttention = 0;
+        for (GItem item : studyInfoWdg.study.children(GItem.class)) {
+            try {
+                Curiosity ci = ItemInfo.find(Curiosity.class, item.info());
+                if (ci != null) {
+                    usedAttention += ci.mw;
+                }
+            } catch (Loading l) {
+            }
+        }
+
+        return new AttentionInfo(maxAttention, usedAttention);
+
+    }
+
     private List<WItem> getInventoryWItems(Inventory invwdg) {
 
         List<WItem> witems = new ArrayList<WItem>();
