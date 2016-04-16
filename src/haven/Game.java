@@ -167,9 +167,15 @@ public class Game extends Widget {
     public void logout() {
 
         GameUI gui = gameui();
+        if (gui == null) {
+            return;
+        }
+
         gui.act("lo");
-        if (gui != null & gui.map != null)
+
+        if (gui.map != null) {
             gui.map.canceltasks();
+        }
 
     }
 
