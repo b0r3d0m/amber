@@ -79,8 +79,8 @@ public class Game extends Widget {
             this.bottomright = bottomright;
         }
 
-        Coord topleft;
-        Coord bottomright;
+        public Coord topleft;
+        public Coord bottomright;
 
     }
 
