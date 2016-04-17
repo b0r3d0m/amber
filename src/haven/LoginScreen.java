@@ -30,7 +30,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 
-import java.io.*;
 import java.util.*;
 
 public class LoginScreen extends Widget {
