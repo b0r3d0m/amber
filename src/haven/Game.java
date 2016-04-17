@@ -212,6 +212,91 @@ public class Game extends Widget {
 
     }
 
+    public String[] getItemsFrom(String windowName) {
+
+        Window invwnd = gameui().getwnd(windowName);
+        if (invwnd == null) {
+            return null;
+        }
+
+        Inventory invwdg = null;
+        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Inventory) {
+                invwdg = (Inventory) wdg;
+            }
+        }
+        if (invwdg == null) {
+            return null;
+        }
+
+        List<String> invitems = new ArrayList<String>();
+
+        List<WItem> charinvwitems = getInventoryWItems(invwdg);
+        for (WItem witm : charinvwitems) {
+            String witmbasename = getItemBaseName(witm);
+            invitems.add(witmbasename);
+        }
+
+        return invitems.toArray(new String[invitems.size()]);
+
+    }
+
+    public boolean transferItemFrom(String windowName, String itemBaseName) {
+
+        Window invwnd = gameui().getwnd(windowName);
+        if (invwnd == null) {
+            return false;
+        }
+
+        Inventory invwdg = null;
+        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Inventory) {
+                invwdg = (Inventory) wdg;
+            }
+        }
+        if (invwdg == null) {
+            return false;
+        }
+
+        WItem witm = getInventoryWItem(invwdg, itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        witm.item.wdgmsg("transfer", Coord.z);
+
+        return true;
+
+    }
+
+    public boolean transferItemsFrom(String windowName, String itemsBaseName) {
+
+        Window invwnd = gameui().getwnd(windowName);
+        if (invwnd == null) {
+            return false;
+        }
+
+        Inventory invwdg = null;
+        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Inventory) {
+                invwdg = (Inventory) wdg;
+            }
+        }
+        if (invwdg == null) {
+            return false;
+        }
+
+        WItem witm = getInventoryWItem(invwdg, itemsBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        witm.item.wdgmsg("transfer-identical", Coord.z);
+
+        return true;
+
+    }
+
     private WItem getCharInventoryWItem(String itemBaseName) {
 
         Inventory charinvwdg = getCharInventoryWidget();
