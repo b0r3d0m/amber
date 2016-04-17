@@ -4,6 +4,10 @@ import java.util.*;
 
 public class Game extends Widget {
 
+    /////////////////////////////
+    // API functions
+    /////////////////////////////
+
     public boolean studyCurio(String curioName) {
 
         WItem curiowitm = getCharInventoryWItem(curioName);
@@ -68,42 +72,21 @@ public class Game extends Widget {
 
     }
 
-    private class Box {
-
-        public Box(Coord topleft, Coord bottomright) {
-            this.topleft = topleft;
-            this.bottomright = bottomright;
-        }
-
-        public Coord topleft;
-        public Coord bottomright;
-
-    }
-
-    private boolean boxesIntersect(Box lhs, Box rhs) {
-
-        boolean intersect =
-               lhs.topleft.x < rhs.bottomright.x
-            && lhs.bottomright.x > rhs.topleft.x
-            && lhs.topleft.y < rhs.bottomright.y
-            && lhs.bottomright.y > rhs.topleft.y;
-        return intersect;
-
-    }
-
     public String[] getInvItems() {
-
-        List<String> invitems = new ArrayList<String>();
 
         Inventory charinvwdg = getCharInventoryWidget();
         if (charinvwdg == null) {
             return null;
         }
 
+        List<String> invitems = new ArrayList<String>();
+
         List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
         for (WItem witm : charinvwitems) {
             String witmbasename = getItemBaseName(witm);
-            invitems.add(witmbasename);
+            if (witmbasename != null) {
+                invitems.add(witmbasename);
+            }
         }
 
         return invitems.toArray(new String[invitems.size()]);
@@ -125,32 +108,6 @@ public class Game extends Widget {
 
     }
 
-    private Gob findGobWithId(long id) {
-
-        OCache oc = ui.sess.glob.oc;
-        synchronized (oc) {
-            for (Gob gob : oc) {
-
-                if (gob.id == id) {
-
-                    return gob;
-
-                }
-
-            }
-        }
-
-        return null;
-
-    }
-
-    private void gobRightClick(Gob gob) {
-
-        GameUI gui = gameui();
-        gui.map.pfRightClick(gob, -1, 3, 0, null);
-
-    }
-
     public boolean pickItem(long id) {
 
         Config.autopick = true;
@@ -162,18 +119,6 @@ public class Game extends Widget {
     public void travelToHearthFire() {
 
         gameui().menu.wdgmsg("act", new Object[]{"travel", "hearth"});
-
-    }
-
-    public class MapObject {
-
-        public MapObject(long id, Coord coords) {
-            this.id = id;
-            this.coords = coords;
-        }
-
-        public long id;
-        public Coord coords;
 
     }
 
@@ -214,27 +159,19 @@ public class Game extends Widget {
 
     public String[] getItemsFrom(String windowName) {
 
-        Window invwnd = gameui().getwnd(windowName);
-        if (invwnd == null) {
-            return null;
-        }
-
-        Inventory invwdg = null;
-        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
-            if (wdg instanceof Inventory) {
-                invwdg = (Inventory) wdg;
-            }
-        }
+        Inventory invwdg = getInventoryWidget(windowName);
         if (invwdg == null) {
             return null;
         }
 
         List<String> invitems = new ArrayList<String>();
 
-        List<WItem> charinvwitems = getInventoryWItems(invwdg);
-        for (WItem witm : charinvwitems) {
+        List<WItem> invwitems = getInventoryWItems(invwdg);
+        for (WItem witm : invwitems) {
             String witmbasename = getItemBaseName(witm);
-            invitems.add(witmbasename);
+            if (witmbasename != null) {
+                invitems.add(witmbasename);
+            }
         }
 
         return invitems.toArray(new String[invitems.size()]);
@@ -243,17 +180,7 @@ public class Game extends Widget {
 
     public boolean transferItemFrom(String windowName, String itemBaseName) {
 
-        Window invwnd = gameui().getwnd(windowName);
-        if (invwnd == null) {
-            return false;
-        }
-
-        Inventory invwdg = null;
-        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
-            if (wdg instanceof Inventory) {
-                invwdg = (Inventory) wdg;
-            }
-        }
+        Inventory invwdg = getInventoryWidget(windowName);
         if (invwdg == null) {
             return false;
         }
@@ -263,7 +190,7 @@ public class Game extends Widget {
             return false;
         }
 
-        witm.item.wdgmsg("transfer", Coord.z);
+        transferWItem(witm);
 
         return true;
 
@@ -271,17 +198,7 @@ public class Game extends Widget {
 
     public boolean transferItemsFrom(String windowName, String itemsBaseName) {
 
-        Window invwnd = gameui().getwnd(windowName);
-        if (invwnd == null) {
-            return false;
-        }
-
-        Inventory invwdg = null;
-        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
-            if (wdg instanceof Inventory) {
-                invwdg = (Inventory) wdg;
-            }
-        }
+        Inventory invwdg = getInventoryWidget(windowName);
         if (invwdg == null) {
             return false;
         }
@@ -291,9 +208,165 @@ public class Game extends Widget {
             return false;
         }
 
-        witm.item.wdgmsg("transfer-identical", Coord.z);
+        transferIdenticalWItems(witm);
 
         return true;
+
+    }
+
+    public boolean transferItem(String itemBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        transferWItem(witm);
+
+        return true;
+
+    }
+
+    public boolean transferItems(String itemsBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemsBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        transferIdenticalWItems(witm);
+
+        return true;
+
+    }
+
+    public void quit() {
+
+        System.exit(0);
+
+    }
+
+    public void logout() {
+
+        GameUI gui = gameui();
+        if (gui == null) {
+            return;
+        }
+
+        gui.act("lo");
+
+        if (gui.map != null) {
+            gui.map.canceltasks();
+        }
+
+    }
+
+    public AttentionInfo getCharAttentionInfo() {
+
+        CharWnd.StudyInfo studyInfoWdg = getStudyInfoWdg();
+        if (studyInfoWdg == null) {
+            return null;
+        }
+
+        int maxAttention = ui.sess.glob.cattr.get("int").comp;
+
+        int usedAttention = 0;
+        for (GItem item : studyInfoWdg.study.children(GItem.class)) {
+            try {
+                Curiosity ci = ItemInfo.find(Curiosity.class, item.info());
+                if (ci != null) {
+                    usedAttention += ci.mw;
+                }
+            } catch (Loading l) {
+            }
+        }
+
+        return new AttentionInfo(maxAttention, usedAttention);
+
+    }
+
+    /////////////////////////////
+    // API-related classes
+    /////////////////////////////
+
+    public class AttentionInfo {
+
+        public AttentionInfo(int max, int used) {
+            this.max = max;
+            this.used = used;
+        }
+
+        public int max;
+        public int used;
+
+    }
+
+    public class MapObject {
+
+        public MapObject(long id, Coord coords) {
+            this.id = id;
+            this.coords = coords;
+        }
+
+        public long id;
+        public Coord coords;
+
+    }
+
+    /////////////////////////////
+    // Internal helper classes
+    /////////////////////////////
+
+    private class Box {
+
+        public Box(Coord topleft, Coord bottomright) {
+            this.topleft = topleft;
+            this.bottomright = bottomright;
+        }
+
+        public Coord topleft;
+        public Coord bottomright;
+
+    }
+
+    /////////////////////////////
+    // Internal helper functions
+    /////////////////////////////
+
+    private boolean boxesIntersect(Box lhs, Box rhs) {
+
+        boolean intersect =
+               lhs.topleft.x < rhs.bottomright.x
+            && lhs.bottomright.x > rhs.topleft.x
+            && lhs.topleft.y < rhs.bottomright.y
+            && lhs.bottomright.y > rhs.topleft.y;
+        return intersect;
+
+    }
+
+    private Gob findGobWithId(long id) {
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                if (gob.id == id) {
+
+                    return gob;
+
+                }
+
+            }
+        }
+
+        return null;
+
+    }
+
+    private void gobRightClick(Gob gob) {
+
+        GameUI gui = gameui();
+        gui.map.pfRightClick(gob, -1, 3, 0, null);
 
     }
 
@@ -329,56 +402,13 @@ public class Game extends Widget {
 
     }
 
-    public boolean transferItem(String itemBaseName) {
-
-        WItem witm = getCharInventoryWItem(itemBaseName);
-        if (witm == null) {
-            return false;
-        }
-
-        witm.item.wdgmsg("transfer", Coord.z);
-
-        return true;
-
-    }
-
-    public boolean transferItems(String itemsBaseName) {
-
-        WItem witm = getCharInventoryWItem(itemsBaseName);
-        if (witm == null) {
-            return false;
-        }
-
-        witm.item.wdgmsg("transfer-identical", Coord.z);
-
-        return true;
-
-    }
-
-    public void quit() {
-
-        System.exit(0);
-
-    }
-
-    public void logout() {
-
-        GameUI gui = gameui();
-        if (gui == null) {
-            return;
-        }
-
-        gui.act("lo");
-
-        if (gui.map != null) {
-            gui.map.canceltasks();
-        }
-
-    }
-
     private Inventory getCharInventoryWidget() {
 
         Window invwnd = gameui().getwnd("Inventory");
+        if (invwnd == null) {
+            return null;
+        }
+
         for (Widget invwdg = invwnd.lchild; invwdg != null; invwdg = invwdg.prev) {
             if (invwdg instanceof Inventory) {
                 return (Inventory) invwdg;
@@ -392,6 +422,10 @@ public class Game extends Widget {
     private Inventory getStudyInventoryWidget() {
 
         Window charsheet = gameui().getwnd("Character Sheet");
+        if (charsheet == null) {
+            return null;
+        }
+
         for (Widget firstlvlwdg = charsheet.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
             for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
                 if (secondlvlwdg instanceof Inventory && secondlvlwdg.parent instanceof Tabs.Tab) {
@@ -404,21 +438,30 @@ public class Game extends Widget {
 
     }
 
-    public class AttentionInfo {
+    private Inventory getInventoryWidget(String windowName) {
 
-        public AttentionInfo(int max, int used) {
-            this.max = max;
-            this.used = used;
+        Window invwnd = gameui().getwnd(windowName);
+        if (invwnd == null) {
+            return null;
         }
 
-        public int max;
-        public int used;
+        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Inventory) {
+                return (Inventory) wdg;
+            }
+        }
+
+        return null;
 
     }
 
     private CharWnd.StudyInfo getStudyInfoWdg() {
 
         Window charsheet = gameui().getwnd("Character Sheet");
+        if (charsheet == null) {
+            return null;
+        }
+
         for (Widget firstlvlwdg = charsheet.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
             for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
                 if (secondlvlwdg instanceof CharWnd.StudyInfo && secondlvlwdg.parent instanceof Tabs.Tab) {
@@ -428,30 +471,6 @@ public class Game extends Widget {
         }
 
         return null;
-
-    }
-
-    public AttentionInfo getCharAttentionInfo() {
-
-        CharWnd.StudyInfo studyInfoWdg = getStudyInfoWdg();
-        if (studyInfoWdg == null) {
-            return null;
-        }
-
-        int maxAttention = ui.sess.glob.cattr.get("int").comp;
-
-        int usedAttention = 0;
-        for (GItem item : studyInfoWdg.study.children(GItem.class)) {
-            try {
-                Curiosity ci = ItemInfo.find(Curiosity.class, item.info());
-                if (ci != null) {
-                    usedAttention += ci.mw;
-                }
-            } catch (Loading l) {
-            }
-        }
-
-        return new AttentionInfo(maxAttention, usedAttention);
 
     }
 
@@ -520,10 +539,11 @@ public class Game extends Widget {
         for (Widget witm = invwdg.lchild; witm != null; witm = witm.prev) {
             if (witm instanceof WItem) {
 
-                Resource res = ((WItem) witm).item.getres();
-                if (res != null) {
-                    if (res.basename().equals(itemsbasename)) {
-                        witems.add((WItem) witm);
+                WItem item = (WItem) witm;
+                String witmbasename = getItemBaseName(item);
+                if (witmbasename != null) {
+                    if (witmbasename.equals(itemsbasename)) {
+                        witems.add(item);
                     }
                 }
 
@@ -541,8 +561,10 @@ public class Game extends Widget {
 
                 WItem item = (WItem) witm;
                 String witmbasename = getItemBaseName(item);
-                if (witmbasename.equals(itemBaseName)) {
-                    return item;
+                if (witmbasename != null) {
+                    if (witmbasename.equals(itemBaseName)) {
+                        return item;
+                    }
                 }
 
             }
@@ -560,6 +582,18 @@ public class Game extends Widget {
             return null;
         }
         return nres.basename();
+
+    }
+
+    private void transferWItem(WItem witm) {
+
+        witm.item.wdgmsg("transfer", Coord.z);
+
+    }
+
+    private void transferIdenticalWItems(WItem witm) {
+
+        witm.item.wdgmsg("transfer-identical", Coord.z);
 
     }
 
