@@ -593,7 +593,7 @@ public class Game extends Widget {
 
     private void transferIdenticalWItems(WItem witm) {
 
-        witm.item.wdgmsg("transfer-identical", Coord.z);
+        witm.item.wdgmsg("transfer-identical", witm.item);
 
     }
 
