@@ -83,7 +83,7 @@ public class Game extends Widget {
 
         List<WItem> charinvwitems = getInventoryWItems(charinvwdg);
         for (WItem witm : charinvwitems) {
-            String witmbasename = getItemBaseName(witm);
+            String witmbasename = getWItemBaseName(witm);
             if (witmbasename != null) {
                 invitems.add(witmbasename);
             }
@@ -168,7 +168,7 @@ public class Game extends Widget {
 
         List<WItem> invwitems = getInventoryWItems(invwdg);
         for (WItem witm : invwitems) {
-            String witmbasename = getItemBaseName(witm);
+            String witmbasename = getWItemBaseName(witm);
             if (witmbasename != null) {
                 invitems.add(witmbasename);
             }
@@ -282,6 +282,73 @@ public class Game extends Widget {
         }
 
         return new AttentionInfo(maxAttention, usedAttention);
+
+    }
+
+    public void drink() {
+
+        Config.autodrink = true;
+
+        GameUI gui = gameui();
+        Window eqwnd = gui.getwnd("Equipment");
+        if (eqwnd == null) {
+            return;
+        }
+
+        String[] waterContainersBaseNames = { "bucket-water", "waterskin", "waterflask", "kuksa-full" };
+
+        for (Widget firstlvlwdg = eqwnd.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
+            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
+                if (secondlvlwdg instanceof WItem) {
+                    WItem witm = (WItem) secondlvlwdg;
+
+                    String witmBaseName = getWItemBaseName(witm);
+                    if (witmBaseName == null) {
+                        continue;
+                    }
+
+                    if (Arrays.asList(waterContainersBaseNames).contains(witmBaseName)) {
+
+                        drink(witm);
+
+                        Integer stam = getStamina();
+                        if (stam == 100) {
+                            return;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        for (String waterContainerBaseName : waterContainersBaseNames) {
+            List<WItem> waterContainers = getCharInventoryWItems(waterContainerBaseName);
+            if (waterContainers == null) {
+                continue;
+            }
+
+            for (WItem waterContainer : waterContainers) {
+
+                drink(waterContainer);
+
+                Integer stam = getStamina();
+                if (stam == 100) {
+                    return;
+                }
+
+            }
+        }
+
+    }
+
+    public int getStamina() {
+
+        IMeter.Meter stam = gameui().getmeter("stam", 0);
+        if (stam == null) {
+            return -1;
+        }
+
+        return stam.a;
 
     }
 
@@ -540,7 +607,7 @@ public class Game extends Widget {
             if (witm instanceof WItem) {
 
                 WItem item = (WItem) witm;
-                String witmbasename = getItemBaseName(item);
+                String witmbasename = getWItemBaseName(item);
                 if (witmbasename != null) {
                     if (witmbasename.equals(itemsbasename)) {
                         witems.add(item);
@@ -560,7 +627,7 @@ public class Game extends Widget {
             if (witm instanceof WItem) {
 
                 WItem item = (WItem) witm;
-                String witmbasename = getItemBaseName(item);
+                String witmbasename = getWItemBaseName(item);
                 if (witmbasename != null) {
                     if (witmbasename.equals(itemBaseName)) {
                         return item;
@@ -574,7 +641,7 @@ public class Game extends Widget {
 
     }
 
-    private String getItemBaseName(WItem witm) {
+    private String getWItemBaseName(WItem witm) {
 
         GItem ngitm = witm.item;
         Resource nres = ngitm.resource();
@@ -594,6 +661,24 @@ public class Game extends Widget {
     private void transferIdenticalWItems(WItem witm) {
 
         witm.item.wdgmsg("transfer-identical", witm.item);
+
+    }
+
+    // Actually it doesn't drink anything by itself -- you have to set Config.autodrink before calling this function
+    private void drink(WItem waterContainer) {
+
+        waterContainer.item.wdgmsg("iact", waterContainer.c, 0);
+
+        GameUI gui = gameui();
+
+        try {
+            Thread.sleep(1000);
+            while (gui.prog >= 0) {
+                Thread.sleep(10);
+            }
+        } catch (InterruptedException e) {
+            return;
+        }
 
     }
 
