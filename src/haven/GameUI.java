@@ -201,6 +201,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         add(game, new Coord(0, 0));
 
         if (!gameloadedcalled) {
+            // It seems that there's no easy way to check whether the game was fully loaded,
+            // so let's just call `onGameLoaded` function after few seconds
             GameUI.eval.addDelayedTask(() -> {
                 GameUI.eval.call("onGameLoaded", new Object[] { GameUI.game });
             }, 10000);

@@ -62,6 +62,8 @@ public class LoginScreen extends Widget {
         GameUI.trackon = false;
         GameUI.crimeon = false;
 
+        // The `LoginScreen` should be added to its parent before calling `wdgmsg` function with the "login" action,
+        // so let's pretend that 100 milliseconds is enough for that
         GameUI.eval.addDelayedTask(() -> {
 
             Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) GameUI.eval.call("onLogin");
