@@ -4,6 +4,13 @@ import java.util.*;
 
 public class Game extends Widget {
 
+    // Let's pretend that gameui() method will never return null
+    // (there are a lot of such assumptions in the client's code anyway)
+
+    // Code style is really a mess here...
+    // This is a result of the mixed code style in other files
+    // and the fact that I want JS-styled camelCase API functions
+
     /////////////////////////////
     // API functions
     /////////////////////////////
@@ -433,7 +440,15 @@ public class Game extends Widget {
     private void gobRightClick(Gob gob) {
 
         GameUI gui = gameui();
-        gui.map.pfRightClick(gob, -1, 3, 0, null);
+        gui.map.pfRightClick(
+            gob, // Gob object to click on
+            -1,  // meshid -- should be -1,
+                 // (unless we want to click house doors -- then we'll need to pass a correct id for the door's mesh)
+            3,   // clickb -- either 1 for left mouse button or 3 for right
+            0,   // modflags -- 0, or 1 if we want to simulate clicking with the Shift key pressed
+                 // (useful when putting things into a stockpile for example)
+            null
+        );
 
     }
 
@@ -667,7 +682,7 @@ public class Game extends Widget {
     // Actually it doesn't drink anything by itself -- you have to set Config.autodrink before calling this function
     private void drink(WItem waterContainer) {
 
-        waterContainer.item.wdgmsg("iact", waterContainer.c, 0);
+        waterContainer.item.wdgmsg("iact", waterContainer.c, 0); // 0 for modflags (no Shift or similar things)
 
         GameUI gui = gameui();
 

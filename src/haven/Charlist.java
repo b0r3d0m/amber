@@ -26,7 +26,6 @@
 
 package haven;
 
-import java.io.*;
 import java.util.*;
 
 public class Charlist extends Widget {

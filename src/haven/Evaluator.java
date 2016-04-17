@@ -9,6 +9,8 @@ public class Evaluator {
 
     public Evaluator(String scriptPath) {
 
+        // Let's create a single-threaded event loop
+
         evaluatorThread = new Thread(() -> {
 
             initContext();
