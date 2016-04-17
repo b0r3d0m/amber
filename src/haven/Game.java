@@ -6,21 +6,17 @@ public class Game extends Widget {
 
     public boolean studyCurio(String curioName) {
 
-        Inventory charinvwdg = getCharInventoryWidget();
-        Inventory studyinvwdg = getStudyInventoryWidget();
-        if (charinvwdg == null || studyinvwdg == null) {
-            return false;
-        }
-
-        WItem curiowitm = getInventoryWItem(charinvwdg, curioName);
+        WItem curiowitm = getCharInventoryWItem(curioName);
         if (curiowitm == null) {
             return false;
         }
 
-        WItem studywitem = getInventoryWItem(studyinvwdg, curioName);
+        WItem studywitem = getStudyInventoryWItem(curioName);
         if (studywitem != null) {
             return false;
         }
+
+        Inventory studyinvwdg = getStudyInventoryWidget();
 
         List<WItem> studyinvwitems = getInventoryWItems(studyinvwdg);
         if (studyinvwitems.isEmpty()) {
@@ -129,9 +125,7 @@ public class Game extends Widget {
 
     }
 
-    public boolean pickItem(long id) {
-
-        Config.autopick = true;
+    private Gob findGobWithId(long id) {
 
         OCache oc = ui.sess.glob.oc;
         synchronized (oc) {
@@ -139,22 +133,140 @@ public class Game extends Widget {
 
                 if (gob.id == id) {
 
-                    GameUI gui = gameui();
-                    gui.map.pfRightClick(gob, -1, 3, 0, null);
-                    return true;
+                    return gob;
 
                 }
 
             }
         }
 
-        return false;
+        return null;
+
+    }
+
+    private void gobRightClick(Gob gob) {
+
+        GameUI gui = gameui();
+        gui.map.pfRightClick(gob, -1, 3, 0, null);
+
+    }
+
+    public boolean pickItem(long id) {
+
+        Config.autopick = true;
+
+        return mapObjectRightClick(id);
 
     }
 
     public void travelToHearthFire() {
 
         gameui().menu.wdgmsg("act", new Object[]{"travel", "hearth"});
+
+    }
+
+    public class MapObject {
+
+        public MapObject(long id, Coord coords) {
+            this.id = id;
+            this.coords = coords;
+        }
+
+        public long id;
+        public Coord coords;
+
+    }
+
+    public MapObject[] getMapObjects(String name) {
+
+        List<MapObject> mapObjects = new ArrayList<MapObject>();
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                Resource res = gob.getres();
+                if (res != null) {
+                    if (res.basename().equals(name)) {
+                        mapObjects.add(new MapObject(gob.id, gob.rc));
+                    }
+                }
+
+            }
+        }
+
+        return mapObjects.toArray(new MapObject[mapObjects.size()]);
+
+    }
+
+    public boolean mapObjectRightClick(long id) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return false;
+        }
+
+        gobRightClick(gob);
+
+        return true;
+
+    }
+
+    private WItem getCharInventoryWItem(String itemBaseName) {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
+        WItem witm = getInventoryWItem(charinvwdg, itemBaseName);
+        if (witm == null) {
+            return null;
+        }
+
+        return witm;
+
+    }
+
+    private WItem getStudyInventoryWItem(String itemBaseName) {
+
+        Inventory studyinvwdg = getStudyInventoryWidget();
+        if (studyinvwdg == null) {
+            return null;
+        }
+
+        WItem witm = getInventoryWItem(studyinvwdg, itemBaseName);
+        if (witm == null) {
+            return null;
+        }
+
+        return witm;
+
+    }
+
+    public boolean transferItem(String itemBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        witm.item.wdgmsg("transfer", Coord.z);
+
+        return true;
+
+    }
+
+    public boolean transferItems(String itemsBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemsBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        witm.item.wdgmsg("transfer-identical", Coord.z);
+
+        return true;
 
     }
 
@@ -258,6 +370,50 @@ public class Game extends Widget {
 
     }
 
+    private List<WItem> getCharInventoryWItems() {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
+        return getInventoryWItems(charinvwdg);
+
+    }
+
+    private List<WItem> getCharInventoryWItems(String itemsBaseName) {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
+        return getInventoryWItems(charinvwdg, itemsBaseName);
+
+    }
+
+    private List<WItem> getStudyInventoryWItems() {
+
+        Inventory studyinvwdg = getStudyInventoryWidget();
+        if (studyinvwdg == null) {
+            return null;
+        }
+
+        return getInventoryWItems(studyinvwdg);
+
+    }
+
+    private List<WItem> getStudyInventoryWItems(String itemsBaseName) {
+
+        Inventory studyinvwdg = getStudyInventoryWidget();
+        if (studyinvwdg == null) {
+            return null;
+        }
+
+        return getInventoryWItems(studyinvwdg, itemsBaseName);
+
+    }
+
     private List<WItem> getInventoryWItems(Inventory invwdg) {
 
         List<WItem> witems = new ArrayList<WItem>();
@@ -265,6 +421,27 @@ public class Game extends Widget {
         for (Widget witm = invwdg.lchild; witm != null; witm = witm.prev) {
             if (witm instanceof WItem) {
                 witems.add((WItem) witm);
+            }
+        }
+
+        return witems;
+
+    }
+
+    private List<WItem> getInventoryWItems(Inventory invwdg, String itemsbasename) {
+
+        List<WItem> witems = new ArrayList<WItem>();
+
+        for (Widget witm = invwdg.lchild; witm != null; witm = witm.prev) {
+            if (witm instanceof WItem) {
+
+                Resource res = ((WItem) witm).item.getres();
+                if (res != null) {
+                    if (res.basename().equals(itemsbasename)) {
+                        witems.add((WItem) witm);
+                    }
+                }
+
             }
         }
 
