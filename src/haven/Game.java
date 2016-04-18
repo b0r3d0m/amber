@@ -294,8 +294,6 @@ public class Game extends Widget {
 
     public void drink() {
 
-        Config.autodrink = true;
-
         GameUI gui = gameui();
         Window eqwnd = gui.getwnd("Equipment");
         if (eqwnd == null) {
@@ -726,8 +724,9 @@ public class Game extends Widget {
 
     }
 
-    // Actually it doesn't drink anything by itself -- you have to set Config.autodrink before calling this function
     private void drink(WItem waterContainer) {
+
+        Config.autodrink = true;
 
         waterContainer.item.wdgmsg("iact", waterContainer.c, 0); // 0 for modflags (no Shift or similar things)
 
