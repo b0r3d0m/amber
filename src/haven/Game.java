@@ -359,6 +359,53 @@ public class Game extends Widget {
 
     }
 
+    public int getEnergy() {
+
+        IMeter.Meter nrj = gameui().getmeter("nrj", 0);
+        if (nrj == null) {
+            return -1;
+        }
+
+        return nrj.a;
+
+    }
+
+    public boolean eat(String itemBaseName) {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return false;
+        }
+
+        WItem witm = getInventoryWItem(charinvwdg, itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        eat(witm);
+
+        return true;
+
+    }
+
+    public boolean eatFrom(String windowName, String itemBaseName) {
+
+        Inventory invwdg = getInventoryWidget(windowName);
+        if (invwdg == null) {
+            return false;
+        }
+
+        WItem witm = getInventoryWItem(invwdg, itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        eat(witm);
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -694,6 +741,14 @@ public class Game extends Widget {
         } catch (InterruptedException e) {
             return;
         }
+
+    }
+
+    private void eat(WItem foodWitm) {
+
+        Config.autoeat = true;
+
+        foodWitm.item.wdgmsg("iact", foodWitm.c, 0); // 0 for modflags (no Shift or similar things)
 
     }
 
