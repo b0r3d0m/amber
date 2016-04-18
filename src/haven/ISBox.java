@@ -31,6 +31,25 @@ public class ISBox extends Widget implements DTarget {
     static Text.Foundry lf;
     private Indir<Resource> res;
     private Text label;
+    private int rem;
+    private int av;
+    private int bi;
+
+    public class ISBoxInfo {
+
+        public ISBoxInfo(String resBaseName, int used, int total, int built) {
+            this.resBaseName = resBaseName;
+            this.used = used;
+            this.total = total;
+            this.built = built;
+        }
+
+        public String resBaseName;
+        public int used;
+        public int total;
+        public int built;
+
+    }
 
     static {
         lf = new Text.Foundry(Text.sans, 22, java.awt.Color.WHITE);
@@ -50,6 +69,10 @@ public class ISBox extends Widget implements DTarget {
     }
 
     private void setlabel(int rem, int av, int bi) {
+        this.rem = rem;
+        this.av = av;
+        this.bi = bi;
+
         if (bi < 0)
             label = lf.renderf("%d/%d", rem, av);
         else
@@ -139,5 +162,11 @@ public class ISBox extends Widget implements DTarget {
             }
         }
         return Integer.MAX_VALUE;
+    }
+
+    public ISBoxInfo getISBoxInfo() {
+
+        return new ISBoxInfo(res.get().basename(), rem, av, bi);
+
     }
 }

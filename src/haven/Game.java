@@ -404,6 +404,40 @@ public class Game extends Widget {
 
     }
 
+    public boolean takeItemFromStockpile() {
+
+        Window stockpilewnd = gameui().getwnd("Stockpile");
+        if (stockpilewnd == null) {
+            return false;
+        }
+
+        ISBox isb = getISBox(stockpilewnd);
+        if (isb == null) {
+            return false;
+        }
+
+        isb.wdgmsg("xfer");
+
+        return true;
+
+    }
+
+    public ISBox.ISBoxInfo getStockpileInfo() {
+
+        Window stockpilewnd = gameui().getwnd("Stockpile");
+        if (stockpilewnd == null) {
+            return null;
+        }
+
+        ISBox isb = getISBox(stockpilewnd);
+        if (isb == null) {
+            return null;
+        }
+
+        return isb.getISBoxInfo();
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -748,6 +782,18 @@ public class Game extends Widget {
         Config.autoeat = true;
 
         foodWitm.item.wdgmsg("iact", foodWitm.c, 0); // 0 for modflags (no Shift or similar things)
+
+    }
+
+    private ISBox getISBox(Window wnd) {
+
+        for (Widget w = wnd.lchild; w != null; w = w.prev) {
+            if (w instanceof ISBox) {
+                return (ISBox) w;
+            }
+        }
+
+        return null;
 
     }
 
