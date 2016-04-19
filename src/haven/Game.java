@@ -438,6 +438,46 @@ public class Game extends Widget {
 
     }
 
+    public boolean createStockpileWithItem(String itemBaseName, int x, int y) {
+
+        WItem witm = getCharInventoryWItem(itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        // I think that there should be a better way to do it
+        // but this is what I can think of at the moment
+
+        GItem itm = witm.item;
+
+        itm.wdgmsg("take", witm.c);
+
+        try {
+
+            Thread.sleep(500);
+
+            GameUI gui = gameui();
+
+            gui.map.iteminteract(new Coord(x, y), Coord.z); // the second argument is ignored
+
+            Thread.sleep(500);
+
+            gui.map.wdgmsg(
+                "place",
+                new Coord(x, y),
+                -180, // direction
+                1,    // mouse button (1 for left, 3 for right)
+                0     // modflags (0 -- no Shift or such stuff)
+            );
+
+        } catch (InterruptedException ie) {
+            return false;
+        }
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
