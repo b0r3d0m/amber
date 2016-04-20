@@ -44,6 +44,21 @@ public class Evaluator {
         });
         evaluatorThread.start();
 
+        stdinHandlerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    String userInput = br.readLine();
+
+                    addTaskToQueue(() -> {
+                        call("onUserInput", new Object[] { userInput });
+                    });
+                } catch (Exception ex) {
+                    return;
+                }
+            }
+        });
+        stdinHandlerThread.start();
+
     }
 
     private void initContext() {
@@ -105,9 +120,15 @@ public class Evaluator {
 
     protected void finalize() throws Throwable {
 
+        br.close();
+        stdinHandlerThread.interrupt();
+        stdinHandlerThread.join();
+
         evaluatorThread.interrupt();
         evaluatorThread.join();
+
         Context.exit();
+
         super.finalize();
 
     }
@@ -141,6 +162,9 @@ public class Evaluator {
     private final Object tasksSync = new Object();
 
     private Thread evaluatorThread;
+
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private Thread stdinHandlerThread;
 
     private Context cx;
     private ScriptableObject scope;
