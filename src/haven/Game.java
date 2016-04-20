@@ -580,6 +580,16 @@ public class Game extends Widget {
 
     }
 
+    public void waitForPf() {
+
+        try {
+            gameui().map.pfthread.join();
+        } catch (InterruptedException e) {
+            // ignored
+        }
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
