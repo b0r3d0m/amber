@@ -753,6 +753,10 @@ public class ChatUI extends Widget {
                 else
                     return (r.sz());
             }
+
+            public String getcn() {
+                return cn;
+            }
         }
 
         public class MyMessage extends SimpleMessage {
@@ -810,6 +814,10 @@ public class ChatUI extends Widget {
                     if (urgency > 0)
                         notify(cmsg, urgency);
                     save(cmsg.text().text);
+
+                    GameUI.eval.addTaskToQueue(() -> {
+                        GameUI.eval.call("onChatMessage", new Object[] { name, ((NamedMessage) cmsg).getcn(), line });
+                    });
                 }
             } else {
                 super.uimsg(msg, args);
@@ -855,6 +863,10 @@ public class ChatUI extends Widget {
                         Audio.play(alarmsfx, Config.partychatalarmvol);
                         lastmsg = time;
                     }
+
+                    GameUI.eval.addTaskToQueue(() -> {
+                        GameUI.eval.call("onChatMessage", new Object[] { "Party", ((NamedMessage) cmsg).getcn(), line });
+                    });
                 }
             } else {
                 super.uimsg(msg, args);
@@ -900,6 +912,10 @@ public class ChatUI extends Widget {
                         Audio.play(alarmsfx, Config.chatalarmvol);
                         lastmsg = time;
                     }
+
+                    GameUI.eval.addTaskToQueue(() -> {
+                        GameUI.eval.call("onChatMessage", new Object[] { "Private", buddy != null ? buddy.name : "???", line });
+                    });
                 } else if (t.equals("out")) {
                     OutMessage om = new OutMessage(line, iw());
                     append(om);
