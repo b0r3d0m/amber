@@ -498,6 +498,79 @@ public class Game extends Widget {
 
     }
 
+    public String[] getEquippedItems() {
+
+        Equipory equipory = gameui().getequipory();
+        if (equipory == null) {
+            return null;
+        }
+
+        List<String> equippedItems = new ArrayList<String>();
+
+        for (Widget wdg = equipory.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof WItem) {
+                WItem witm = (WItem) wdg;
+
+                String witmBaseName = getWItemBaseName(witm);
+                if (witmBaseName == null) {
+                    continue;
+                }
+
+                equippedItems.add(witmBaseName);
+            }
+        }
+
+        return equippedItems.toArray(new String[equippedItems.size()]);
+
+    }
+
+    public boolean equipItem(String itemBaseName) {
+
+        WItem witmtoequip = getCharInventoryWItem(itemBaseName);
+        if (witmtoequip == null) {
+            return false;
+        }
+
+        Equipory equipory = gameui().getequipory();
+        if (equipory == null) {
+            return false;
+        }
+
+        witmtoequip.item.wdgmsg("take", witmtoequip.c);
+
+        equipory.wdgmsg("drop", -1);
+
+        return true;
+
+    }
+
+    public boolean unequipItem(String itemBaseName) {
+
+        Equipory equipory = gameui().getequipory();
+        if (equipory == null) {
+            return false;
+        }
+
+        for (Widget wdg = equipory.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof WItem) {
+                WItem witm = (WItem) wdg;
+
+                String witmBaseName = getWItemBaseName(witm);
+                if (witmBaseName == null) {
+                    continue;
+                }
+
+                if (witmBaseName.equals(itemBaseName)) {
+                    witm.item.wdgmsg("transfer", witm.c);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
