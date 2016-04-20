@@ -478,7 +478,7 @@ public class Game extends Widget {
 
             GameUI gui = gameui();
 
-            gui.map.iteminteract(new Coord(x, y), Coord.z); // the second argument is ignored
+            gui.map.wdgmsg("itemact", Coord.z, new Coord(x, y), 0);
 
             Thread.sleep(500);
 
