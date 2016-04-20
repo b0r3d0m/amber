@@ -39,6 +39,7 @@ public class FlowerMenu extends Widget {
     public static final int ph = 30, ppl = 8;
     public Petal[] opts;
     private UI.Grab mg, kg;
+    private String chosen;
     
     @RName("sm")
     public static class $_ implements Factory {
@@ -107,6 +108,13 @@ public class FlowerMenu extends Widget {
             for (Petal p : opts) {
                 p.move(p.ta + ((1 - s) * PI), p.tr * s);
                 p.a = s;
+
+                if (!chosen.isEmpty()) {
+                    if (p.name.equals(chosen)) {
+                        choose(p);
+                    }
+                }
+
                 if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Pick")))
                     pick = p;
                 else if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Harvest")))
@@ -227,6 +235,8 @@ public class FlowerMenu extends Widget {
             add(opts[i] = new Petal(locName != null ? locName : name));
             opts[i].num = i;
         }
+
+        chosen = (String) GameUI.eval.call("onFlowerMenuOpen", new Object[] { options });
     }
 
     protected void added() {
