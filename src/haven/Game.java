@@ -140,8 +140,28 @@ public class Game extends Widget {
                 Resource res = gob.getres();
                 if (res != null) {
                     if (res.basename().equals(name)) {
-                        mapObjects.add(new MapObject(gob.id, gob.rc));
+                        mapObjects.add(new MapObject(res.basename(), gob.id, gob.rc));
                     }
+                }
+
+            }
+        }
+
+        return mapObjects.toArray(new MapObject[mapObjects.size()]);
+
+    }
+
+    public MapObject[] getAllMapObjects() {
+
+        List<MapObject> mapObjects = new ArrayList<MapObject>();
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                Resource res = gob.getres();
+                if (res != null) {
+                    mapObjects.add(new MapObject(res.basename(), gob.id, gob.rc));
                 }
 
             }
@@ -496,11 +516,13 @@ public class Game extends Widget {
 
     public class MapObject {
 
-        public MapObject(long id, Coord coords) {
+        public MapObject(String name, long id, Coord coords) {
+            this.name = name;
             this.id = id;
             this.coords = coords;
         }
 
+        public String name;
         public long id;
         public Coord coords;
 
