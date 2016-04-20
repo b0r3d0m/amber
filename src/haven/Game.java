@@ -571,6 +571,15 @@ public class Game extends Widget {
 
     }
 
+    public boolean takeItem(String itemBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemBaseName);
+        witm.item.wdgmsg("take", witm.c);
+
+        return false;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
