@@ -590,6 +590,43 @@ public class Game extends Widget {
 
     }
 
+    public boolean sendAreaChatMessage(String msg) {
+
+        return sendMessageToChat("Area Chat", msg);
+
+    }
+
+    public boolean sendPartyChatMessage(String msg) {
+
+        return sendMessageToChat("Party", msg);
+
+    }
+
+    public boolean sendVillageChatMessage(String msg) {
+
+        return sendMessageToChat("Village", msg);
+
+    }
+
+    public boolean sendPrivateChatMessage(String to, String msg) {
+
+        GameUI gui = gameui();
+        for (BuddyWnd.Buddy buddy : gui.buddies) {
+            if (buddy.name.equals(to)) {
+                buddy.chat();
+            }
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ie) {
+            return false;
+        }
+
+        return sendMessageToChat(to, msg);
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -948,6 +985,35 @@ public class Game extends Widget {
         }
 
         return null;
+
+    }
+
+    private ChatUI.EntryChannel getChat(String chatName) {
+
+        GameUI gui = gameui();
+        for (Widget wdg = gui.chat.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof ChatUI.EntryChannel) {
+                ChatUI.EntryChannel chat = (ChatUI.EntryChannel) wdg;
+                if (chat.name().equals(chatName)) {
+                    return chat;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    private boolean sendMessageToChat(String chatName, String msg) {
+
+        ChatUI.EntryChannel areaChat = getChat(chatName);
+        if (areaChat == null) {
+            return false;
+        }
+
+        areaChat.send(msg);
+
+        return true;
 
     }
 
