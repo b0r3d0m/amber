@@ -686,6 +686,31 @@ public class Game extends Widget {
 
     }
 
+    public boolean setSpeed(int speed) {
+
+        if (speed < 0) {
+            return false;
+        }
+
+        GameUI gui = gameui();
+
+        for (Widget firstlvlwdg = gui.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
+            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
+                if (secondlvlwdg instanceof Speedget) {
+                    Speedget speedget = (Speedget) secondlvlwdg;
+                    if (speed > speedget.max) {
+                        return false;
+                    }
+                    speedget.set(speed);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
