@@ -409,6 +409,22 @@ public class Game extends Widget {
 
     }
 
+    public HPInfo getHP() {
+
+        HPInfo hpinfo = new HPInfo(-1, -1);
+
+        List<IMeter.Meter> meters = gameui().getmeters("hp");
+        if (meters == null) {
+            return hpinfo;
+        }
+
+        hpinfo.hhp = meters.get(0).a;
+        hpinfo.shp = meters.get(1).a;
+
+        return hpinfo;
+
+    }
+
     public int getStamina() {
 
         IMeter.Meter stam = gameui().getmeter("stam", 0);
@@ -697,6 +713,18 @@ public class Game extends Widget {
         public String name;
         public long id;
         public Coord coords;
+
+    }
+
+    public static class HPInfo {
+
+        public HPInfo(int shp, int hhp) {
+            this.shp = shp;
+            this.hhp = hhp;
+        }
+
+        public int shp;
+        public int hhp;
 
     }
 
