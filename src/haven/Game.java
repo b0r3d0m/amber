@@ -129,6 +129,49 @@ public class Game extends Widget {
 
     }
 
+    public boolean liftObject(long id) {
+
+        GameUI gui = gameui();
+
+        gui.menu.wdgmsg("act", new Object[]{"carry"});
+
+        waitForHandCursor(1000);
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return false;
+        }
+
+        // Actually pfRightClick function can do both left and right clicks depending on the arguments
+        gui.map.pfRightClick(
+            gob,
+            -1, // meshid -- should be -1,
+                // (unless we want to click house doors -- then we'll need to pass a correct id for the door's mesh)
+            1,  // clickb -- either 1 for left mouse button or 3 for right
+            0,  // modflags -- 0, or 1 if we want to simulate clicking with the Shift key pressed
+                // (useful when putting things into a stockpile for example)
+            null
+        );
+
+        return true;
+
+    }
+
+    public void mapRightClick(int x, int y) {
+
+        // Unfortunately, there's no way to use MapView::pfRightClick function w/o passing a Gob object
+        // and pathfinder doesn't work in such cases like placing a boat
+
+        gameui().map.wdgmsg(
+            "click",
+            Coord.z,
+            new Coord(x, y),
+            3, // mouse button (1 for left, 2 for right)
+            0  // modflags (0 -- no Shift or such stuff)
+        );
+
+    }
+
     public MapObject[] getMapObjects(String name) {
 
         List<MapObject> mapObjects = new ArrayList<MapObject>();
@@ -478,7 +521,7 @@ public class Game extends Widget {
 
             GameUI gui = gameui();
 
-            gui.map.wdgmsg("itemact", Coord.z, new Coord(x, y), 0);
+            gui.map.wdgmsg("itemact", Coord.z, new Coord(x, y), 0); // 0 for modflags (no Shift or such stuff)
 
             Thread.sleep(500);
 
@@ -1014,6 +1057,36 @@ public class Game extends Widget {
         areaChat.send(msg);
 
         return true;
+
+    }
+
+    private boolean waitForHandCursor(long timeoutMillisecs) {
+        return waitForCursor("gfx/hud/curs/hand", timeoutMillisecs);
+    }
+
+    private boolean waitForCursor(String cursorName, long timeoutMillisecs) {
+
+        long millisecsPassed = 0;
+
+        Resource curs = null;
+        do {
+
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                return false;
+            }
+
+            millisecsPassed += 50;
+            if (millisecsPassed >= timeoutMillisecs) {
+                return false;
+            }
+
+            curs = ui.root.getcurs(c);
+
+        } while (curs == null || !curs.name.equals(cursorName));
+
+        return false;
 
     }
 
