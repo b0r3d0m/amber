@@ -686,28 +686,34 @@ public class Game extends Widget {
 
     }
 
+    public int getSpeed() {
+
+        Speedget speedwdg = getSpeedWdg();
+        if (speedwdg == null) {
+            return -1;
+        }
+
+        return speedwdg.cur;
+
+    }
+
     public boolean setSpeed(int speed) {
 
         if (speed < 0) {
             return false;
         }
 
-        GameUI gui = gameui();
-
-        for (Widget firstlvlwdg = gui.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
-            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
-                if (secondlvlwdg instanceof Speedget) {
-                    Speedget speedget = (Speedget) secondlvlwdg;
-                    if (speed > speedget.max) {
-                        return false;
-                    }
-                    speedget.set(speed);
-                    return true;
-                }
-            }
+        Speedget speedwdg = getSpeedWdg();
+        if (speedwdg == null) {
+            return false;
         }
 
-        return false;
+        if (speed > speedwdg.max) {
+            return false;
+        }
+
+        speedwdg.set(speed);
+        return true;
 
     }
 
@@ -1140,6 +1146,22 @@ public class Game extends Widget {
         } while (curs == null || !curs.name.equals(cursorName));
 
         return false;
+
+    }
+
+    private Speedget getSpeedWdg() {
+
+        GameUI gui = gameui();
+
+        for (Widget firstlvlwdg = gui.lchild; firstlvlwdg != null; firstlvlwdg = firstlvlwdg.prev) {
+            for (Widget secondlvlwdg = firstlvlwdg.lchild; secondlvlwdg != null; secondlvlwdg = secondlvlwdg.prev) {
+                if (secondlvlwdg instanceof Speedget) {
+                    return (Speedget) secondlvlwdg;
+                }
+            }
+        }
+
+        return null;
 
     }
 
