@@ -746,6 +746,48 @@ public class Game extends Widget {
 
     }
 
+    public boolean craft(String itemBaseName) {
+
+        gameui().menu.wdgmsg("act", new Object[]{"craft", itemBaseName});
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ie) {
+            return false;
+        }
+
+        Window craftwnd = gameui().getwnd("Crafting");
+        if (craftwnd == null) {
+            return false;
+        }
+
+        craftwnd.lchild.wdgmsg("make", 0); // 0 -- "Craft", 1 -- "Craft all"
+
+        return true;
+
+    }
+
+    public boolean craftAll(String itemBaseName) {
+
+        gameui().menu.wdgmsg("act", new Object[]{"craft", itemBaseName});
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ie) {
+            return false;
+        }
+
+        Window craftwnd = gameui().getwnd("Crafting");
+        if (craftwnd == null) {
+            return false;
+        }
+
+        craftwnd.lchild.wdgmsg("make", 1); // 0 -- "Craft", 1 -- "Craft all"
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
