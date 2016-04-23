@@ -717,6 +717,35 @@ public class Game extends Widget {
 
     }
 
+    public boolean useMenuAction(String[] hotkeys) {
+
+        GameUI gui = gameui();
+
+        Map<Character, Glob.Pagina> hotmap = gui.menu.gethotmap();
+        for (String hotkey : hotkeys) {
+
+            Glob.Pagina pagina = hotmap.get(Character.toUpperCase(hotkey.charAt(0)));
+            if (pagina == null) {
+                gui.menu.reset();
+                return false;
+            }
+
+            gui.menu.use(pagina, true);
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                gui.menu.reset();
+                return false;
+            }
+
+        }
+
+        gui.menu.reset();
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////

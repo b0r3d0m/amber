@@ -340,7 +340,7 @@ public class MenuGrid extends Widget {
         }
     }
 
-    private void use(Pagina r, boolean reset) {
+    public void use(Pagina r, boolean reset) {
         Collection<Pagina> sub = new LinkedList<Pagina>(),
                 cur = new LinkedList<Pagina>();
         cons(r, sub);
@@ -432,5 +432,14 @@ public class MenuGrid extends Widget {
             return (true);
         }
         return (false);
+    }
+
+    public Map<Character, Pagina> gethotmap() {
+        return hotmap;
+    }
+
+    public void reset() {
+        this.cur = null;
+        updlayout();
     }
 }
