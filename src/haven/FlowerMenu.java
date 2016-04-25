@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.util.*;
 
 import static java.lang.Math.PI;
 
@@ -39,7 +40,6 @@ public class FlowerMenu extends Widget {
     public static final int ph = 30, ppl = 8;
     public Petal[] opts;
     private UI.Grab mg, kg;
-    private String chosen;
     
     @RName("sm")
     public static class $_ implements Factory {
@@ -97,6 +97,14 @@ public class FlowerMenu extends Widget {
     public class Opening extends NormAnim {
         Opening() {
             super(Config.instantflowermenu ? 0 : 0.15);
+
+            List<String> options = new ArrayList<String>();
+            for (Petal opt : opts) {
+                options.add(opt.name);
+            }
+            GameUI.eval.addTaskToQueue(() -> {
+                GameUI.eval.call("onFlowerMenuOpen", new Object[] { options.toArray(new String[options.size()]) });
+            });
         }
 
         public void ntick(double s) {
@@ -108,12 +116,6 @@ public class FlowerMenu extends Widget {
             for (Petal p : opts) {
                 p.move(p.ta + ((1 - s) * PI), p.tr * s);
                 p.a = s;
-
-                if (!chosen.isEmpty()) {
-                    if (p.name.equals(chosen)) {
-                        choose(p);
-                    }
-                }
 
                 if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Pick")))
                     pick = p;
@@ -235,8 +237,6 @@ public class FlowerMenu extends Widget {
             add(opts[i] = new Petal(locName != null ? locName : name));
             opts[i].num = i;
         }
-
-        chosen = (String) GameUI.eval.call("onFlowerMenuOpen", new Object[] { options });
     }
 
     protected void added() {
@@ -301,5 +301,16 @@ public class FlowerMenu extends Widget {
         } else {
             wdgmsg("cl", option.num, ui.modflags());
         }
+    }
+
+    public boolean chooseoptwithname(String option) {
+        for (Petal opt : opts) {
+            if (opt.name.equals(option)) {
+                wdgmsg("cl", opt.num, ui.modflags());
+                return true;
+            }
+        }
+
+        return false;
     }
 }

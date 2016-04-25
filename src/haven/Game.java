@@ -788,6 +788,18 @@ public class Game extends Widget {
 
     }
 
+    public boolean chooseFlowerMenuOption(String option) {
+
+        for (Widget wdg = ui.root.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof FlowerMenu) {
+                FlowerMenu flmenu = (FlowerMenu) wdg;
+                return flmenu.chooseoptwithname(option);
+            }
+        }
+
+        return false;
+
+    }
     /////////////////////////////
     // API-related classes
     /////////////////////////////
