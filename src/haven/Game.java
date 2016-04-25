@@ -633,9 +633,13 @@ public class Game extends Widget {
     public boolean takeItem(String itemBaseName) {
 
         WItem witm = getCharInventoryWItem(itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
         witm.item.wdgmsg("take", witm.c);
 
-        return false;
+        return true;
 
     }
 
