@@ -804,6 +804,20 @@ public class Game extends Widget {
         return false;
 
     }
+
+    public boolean dropItem(String itemBaseName) {
+
+        WItem witm = getCharInventoryWItem(itemBaseName);
+        if (witm == null) {
+            return false;
+        }
+
+        witm.item.wdgmsg("drop", Coord.z);
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
