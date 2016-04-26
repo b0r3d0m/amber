@@ -818,6 +818,20 @@ public class Game extends Widget {
 
     }
 
+    public boolean dropItemFromHand() {
+
+        GameUI gui = gameui();
+
+        if (gui.vhand == null) {
+            return false;
+        }
+
+        gui.map.wdgmsg("drop", Coord.z, gui.map.player().rc, 0);
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
