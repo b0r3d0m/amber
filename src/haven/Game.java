@@ -861,6 +861,34 @@ public class Game extends Widget {
 
     }
 
+    public String getBarrelContent(long id) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return null;
+        }
+
+        Resource res = gob.getres();
+        if (res == null || !res.basename().equals("barrel")) {
+            return null;
+        }
+
+        for (Gob.Overlay ol : gob.ols) {
+            Resource olRes = ol.res.get();
+            if (olRes == null) {
+                continue;
+            }
+
+            String olResBaseName = olRes.basename();
+            if (olResBaseName.startsWith("barrel")) {
+                return olResBaseName.substring(olResBaseName.indexOf("-") + 1);
+            }
+        }
+
+        return "empty";
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
