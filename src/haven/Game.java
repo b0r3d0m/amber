@@ -832,6 +832,35 @@ public class Game extends Widget {
 
     }
 
+    public boolean useItemFromHandOnObject(int id) {
+
+        GameUI gui = gameui();
+
+        if (gui.vhand == null) {
+            return false;
+        }
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return false;
+        }
+
+        gui.map.wdgmsg(
+            "itemact",
+            Coord.z,
+            gob.rc,
+            0, // 0 for modflags (no Shift or such stuff)
+            0,
+            (int) gob.id,
+            gob.rc,
+            0, // Overlay ID
+            -1 // Mesh ID
+        );
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
