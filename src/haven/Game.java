@@ -832,7 +832,7 @@ public class Game extends Widget {
 
     }
 
-    public boolean useItemFromHandOnObject(int id) {
+    public boolean useItemFromHandOnObject(long id) {
 
         GameUI gui = gameui();
 
