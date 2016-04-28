@@ -1,6 +1,7 @@
 package haven;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class Game extends Widget {
 
@@ -889,6 +890,49 @@ public class Game extends Widget {
 
     }
 
+    public Double getBarrelLiters(long id) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return null;
+        }
+
+        Resource res = gob.getres();
+        if (res == null || !res.basename().equals("barrel")) {
+            return null;
+        }
+
+        if (!mapObjectRightClick(id)) {
+            return null;
+        }
+
+        Window barrelwnd = waitForWindow("Barrel", 5000);
+        if (barrelwnd == null) {
+            return null;
+        }
+
+        for (Widget wdg = barrelwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Label) {
+                Label label = (Label) wdg;
+                String barrelContentText = label.text.text;
+
+                // Some examples:
+                // Contents: 22.90 l of Water.
+                // Contents: 16.33 l of Honey.
+                // Contents: 0.91 l of Sheepsmilk.
+                Pattern p = Pattern.compile("Contents: ([\\d\\.]+).*");
+                Matcher m = p.matcher(barrelContentText);
+                if (m.find()) {
+                    System.out.println(m.group(1));
+                    return Double.parseDouble(m.group(1));
+                }
+            }
+        }
+
+        return null;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -1318,6 +1362,32 @@ public class Game extends Widget {
         } while (curs == null || !curs.name.equals(cursorName));
 
         return false;
+
+    }
+
+    private Window waitForWindow(String windowName, long timeoutMillisecs) {
+
+        long millisecsPassed = 0;
+
+        Window barrelwnd = null;
+        do {
+
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                return null;
+            }
+
+            millisecsPassed += 50;
+            if (millisecsPassed >= timeoutMillisecs) {
+                return null;
+            }
+
+            barrelwnd = gameui().getwnd(windowName);
+
+        } while (barrelwnd == null);
+
+        return barrelwnd;
 
     }
 
