@@ -184,7 +184,7 @@ public class Game extends Widget {
                 Resource res = gob.getres();
                 if (res != null) {
                     if (res.basename().equals(name)) {
-                        mapObjects.add(new MapObject(res.basename(), gob.id, gob.rc));
+                        mapObjects.add(new MapObject(res.basename(), res.name, gob.id, gob.rc));
                     }
                 }
 
@@ -205,7 +205,7 @@ public class Game extends Widget {
 
                 Resource res = gob.getres();
                 if (res != null) {
-                    mapObjects.add(new MapObject(res.basename(), gob.id, gob.rc));
+                    mapObjects.add(new MapObject(res.basename(), res.name, gob.id, gob.rc));
                 }
 
             }
@@ -952,13 +952,15 @@ public class Game extends Widget {
 
     public class MapObject {
 
-        public MapObject(String name, long id, Coord coords) {
+        public MapObject(String name, String fullName, long id, Coord coords) {
             this.name = name;
+            this.fullName = fullName;
             this.id = id;
             this.coords = coords;
         }
 
         public String name;
+        public String fullName;
         public long id;
         public Coord coords;
 
