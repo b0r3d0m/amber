@@ -917,6 +917,7 @@ public class Game extends Widget {
                 String barrelContentText = label.text.text;
 
                 // Some examples:
+                // Contents: Empty.
                 // Contents: 22.90 l of Water.
                 // Contents: 16.33 l of Honey.
                 // Contents: 0.91 l of Sheepsmilk.
@@ -929,7 +930,7 @@ public class Game extends Widget {
             }
         }
 
-        return null;
+        return 0.0;
 
     }
 
