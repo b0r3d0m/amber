@@ -956,6 +956,34 @@ public class Game extends Widget {
 
     }
 
+    public int getGrowthStage(long id) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return -1;
+        }
+
+        ResDrawable rd = gob.getattr(ResDrawable.class);
+        if (rd == null || rd.sdt.eom()) {
+            return -1;
+        }
+
+        Resource res = gob.getres();
+        if (res == null) {
+            return -1;
+        }
+
+        int stage = rd.sdt.peekrbuf(0);
+        if (res.name.startsWith("gfx/terobjs/plants") && !res.name.endsWith("trellis")) {
+            return stage + 1;
+        } else if (res.name.startsWith("gfx/terobjs/trees") || res.name.startsWith("gfx/terobjs/bushes")) {
+            return stage;
+        }
+
+        return -1;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
