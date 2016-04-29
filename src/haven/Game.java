@@ -195,6 +195,28 @@ public class Game extends Widget {
 
     }
 
+    public MapObject[] getMapObjectsByFullName(String fullName) {
+
+        List<MapObject> mapObjects = new ArrayList<MapObject>();
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                Resource res = gob.getres();
+                if (res != null) {
+                    if (res.name.equals(fullName)) {
+                        mapObjects.add(new MapObject(res.basename(), res.name, gob.id, gob.rc));
+                    }
+                }
+
+            }
+        }
+
+        return mapObjects.toArray(new MapObject[mapObjects.size()]);
+
+    }
+
     public MapObject[] getAllMapObjects() {
 
         List<MapObject> mapObjects = new ArrayList<MapObject>();
