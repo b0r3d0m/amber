@@ -798,6 +798,17 @@ public class ChatUI extends Widget {
                         if (gob != null) {
                             gob.delattr(GobHighlight.class);
                             gob.setattr(new GobHighlight(gob));
+
+                            Resource res = gob.getres();
+                            if (res != null) {
+                                GameUI.eval.addTaskToQueue(() -> {
+                                    GameUI.eval.call(
+                                        "onMapObjectHighlight",
+                                        new Object[] { new Game.MapObject(res.basename(), res.name, gob.id, gob.rc) }
+                                    );
+                                });
+                            }
+
                             return;
                         }
                     } catch (NumberFormatException nfe) {

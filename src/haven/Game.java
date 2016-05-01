@@ -984,6 +984,33 @@ public class Game extends Widget {
 
     }
 
+    public MapObject[] getHighlightedMapObjects() {
+
+        List<MapObject> mapObjects = new ArrayList<MapObject>();
+
+        OCache oc = ui.sess.glob.oc;
+        synchronized (oc) {
+            for (Gob gob : oc) {
+
+                GobHighlight highlight = gob.getattr(GobHighlight.class);
+                if (highlight == null) {
+                    continue;
+                }
+
+                Resource res = gob.getres();
+                if (res == null) {
+                    continue;
+                }
+
+                mapObjects.add(new MapObject(res.basename(), res.name, gob.id, gob.rc));
+
+            }
+        }
+
+        return mapObjects.toArray(new MapObject[mapObjects.size()]);
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -1000,7 +1027,7 @@ public class Game extends Widget {
 
     }
 
-    public class MapObject {
+    static public class MapObject {
 
         public MapObject(String name, String fullName, long id, Coord coords) {
             this.name = name;
