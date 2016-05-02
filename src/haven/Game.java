@@ -1011,6 +1011,19 @@ public class Game extends Widget {
 
     }
 
+    public void waitForTaskToFinish() {
+
+        GameUI gui = gameui();
+        try {
+            while (gui.prog >= 0) {
+                Thread.sleep(10);
+            }
+        } catch (InterruptedException e) {
+            // ignored
+        }
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
