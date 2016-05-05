@@ -30,53 +30,38 @@ public class Game extends Widget {
 
         Inventory studyinvwdg = getStudyInventoryWidget();
 
-        List<WItem> studyinvwitems = getInventoryWItems(studyinvwdg);
-        if (studyinvwitems.isEmpty()) {
-
-            curiowitm.item.wdgmsg("take", curiowitm.c);
-            studyinvwdg.drop(Coord.z, new Coord(0, 0));
-            return true;
-
+        Coord freeCoords = getFreeCoords(studywitem, studyinvwdg);
+        if (freeCoords == null) {
+            return false;
         }
 
-        Coord invtilesz = new Coord(33, 33);
-        for (int x = 1; x < studyinvwdg.sz.x; x += invtilesz.x) {
-            for (int y = 1; y < studyinvwdg.sz.y; y += invtilesz.y) {
+        curiowitm.item.wdgmsg("take", curiowitm.c);
+        studyinvwdg.drop(Coord.z, freeCoords);
+        return true;
 
-                if (x + curiowitm.sz.x > studyinvwdg.sz.x
-                    || y + curiowitm.sz.y > studyinvwdg.sz.y) {
-                    continue;
-                }
+    }
 
-                boolean isIntersect = false;
-                for (WItem witm : studyinvwitems) {
+    public boolean dropItemFromHandToWindow(String windowName) {
 
-                    Box witmbox = new Box(
-                        new Coord(witm.c.x, witm.c.y),
-                        new Coord(witm.c.x + witm.sz.x, witm.c.y + witm.sz.y)
-                    );
-                    Box desiredbox = new Box(
-                        new Coord(x, y),
-                        new Coord(x + curiowitm.sz.x, y + curiowitm.sz.y)
-                    );
+        GameUI gui = gameui();
 
-                    if (boxesIntersect(witmbox, desiredbox)) {
-                        isIntersect = true;
-                        break;
-                    }
-
-                }
-
-                if (!isIntersect) {
-                    curiowitm.item.wdgmsg("take", curiowitm.c);
-                    studyinvwdg.drop(Coord.z, new Coord(x, y));
-                    return true;
-                }
-
-            }
+        if (gui.vhand == null) {
+            return false;
         }
 
-        return false;
+        Inventory destinvwdg = getInventoryWidget(windowName);
+        if (destinvwdg == null) {
+            return false;
+        }
+
+        Coord freeCoords = getFreeCoords(gui.vhand, destinvwdg);
+        if (freeCoords == null) {
+            return false;
+        }
+
+        gui.vhand.item.wdgmsg("take", gui.vhand.c);
+        destinvwdg.drop(Coord.z, freeCoords);
+        return true;
 
     }
 
@@ -1507,6 +1492,52 @@ public class Game extends Widget {
                 if (secondlvlwdg instanceof Speedget) {
                     return (Speedget) secondlvlwdg;
                 }
+            }
+        }
+
+        return null;
+
+    }
+
+    private Coord getFreeCoords(WItem witm, Inventory invwdg) {
+
+        List<WItem> invwitems = getInventoryWItems(invwdg);
+        if (invwitems.isEmpty()) {
+            return Coord.z;
+        }
+
+        Coord invtilesz = new Coord(33, 33);
+        for (int x = 1; x < invwdg.sz.x; x += invtilesz.x) {
+            for (int y = 1; y < invwdg.sz.y; y += invtilesz.y) {
+
+                if (x + witm.sz.x > invwdg.sz.x
+                        || y + witm.sz.y > invwdg.sz.y) {
+                    continue;
+                }
+
+                boolean isIntersect = false;
+                for (WItem invwitm : invwitems) {
+
+                    Box witmbox = new Box(
+                            new Coord(invwitm.c.x, invwitm.c.y),
+                            new Coord(invwitm.c.x + invwitm.sz.x, invwitm.c.y + invwitm.sz.y)
+                    );
+                    Box desiredbox = new Box(
+                            new Coord(x, y),
+                            new Coord(x + witm.sz.x, y + witm.sz.y)
+                    );
+
+                    if (boxesIntersect(witmbox, desiredbox)) {
+                        isIntersect = true;
+                        break;
+                    }
+
+                }
+
+                if (!isIntersect) {
+                    return new Coord(x, y);
+                }
+
             }
         }
 
