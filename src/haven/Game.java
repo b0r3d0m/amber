@@ -884,6 +884,20 @@ public class Game extends Widget {
 
     }
 
+    public boolean useItemFromHandOnCoords(int x, int y) {
+
+        GameUI gui = gameui();
+
+        if (gui.vhand == null) {
+            return false;
+        }
+
+        gui.map.wdgmsg("itemact", Coord.z, new Coord(x, y), 0);
+
+        return true;
+
+    }
+
     public String getBarrelContent(long id) {
 
         Gob gob = findGobWithId(id);
