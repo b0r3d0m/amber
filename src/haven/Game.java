@@ -651,6 +651,25 @@ public class Game extends Widget {
 
     }
 
+    public boolean takeItemFromWindow(String windowName, String itemBaseName) {
+
+        List<Inventory> invwdgs = getInventoryWidgets(windowName);
+        if (invwdgs == null) {
+            return false;
+        }
+
+        for (Inventory invwdg : invwdgs) {
+            WItem witm = getInventoryWItem(invwdg, itemBaseName);
+            if (witm != null) {
+                witm.item.wdgmsg("take", witm.c);
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
     public void waitForPf() {
 
         try {
@@ -1023,6 +1042,57 @@ public class Game extends Widget {
 
     }
 
+    public boolean feastEat(String itemBaseName) {
+
+        if (!activateFeast()) {
+            return false;
+        }
+
+        if (!waitForForkCursor(1000)) {
+            return false;
+        }
+
+        return takeItemFromWindow("Table", itemBaseName);
+
+    }
+
+    public boolean openTable(long id) {
+
+        // pfRightClick function doesn't work with tables
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return false;
+        }
+
+        GameUI gui = gameui();
+
+        if (gob.ols != null && gob.ols.size() > 0) {
+            Gob.Overlay ol = gob.ols.iterator().next();
+
+            gui.map.wdgmsg(
+                    "click",        // Action
+                    Coord.z,        // Actually we need to pass gob's window coordinates as the second argument (i.e., gob.sc)
+                                    // but Coord.z works too
+                    gob.rc,         // Actual coord we clicked
+                    3,              // Mouse button (3 for RMB)
+                    0,              // Modflags (0 for nothing)
+                    1,              // It seems that this argument tells server whether we clicked gob with overlay or not
+                                    // 0 -- without overlay, 1 -- with overlay
+                    (int) gob.id,   // Gob's ID
+                                    // We need to cast it from long to int. Otherwise we will get "java.lang.RuntimeException: Cannot encode a class java.lang.Long as TTO"
+                    gob.rc,         // Gob's coords
+                    ol.id,          // Overlay ID
+                    -1              // Meshid (should be -1 for non-door gobs)
+            );
+        } else {
+            gui.map.wdgmsg("click", Coord.z, gob.rc, 3, ui.modflags(), 0, (int) gob.id, gob.rc, 0, -1);
+        }
+
+        return true;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -1214,6 +1284,24 @@ public class Game extends Widget {
         }
 
         return null;
+
+    }
+
+    private List<Inventory> getInventoryWidgets(String windowName) {
+
+        Window invwnd = gameui().getwnd(windowName);
+        if (invwnd == null) {
+            return null;
+        }
+
+        List<Inventory> invwdgs = new ArrayList<Inventory>();
+        for (Widget wdg = invwnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Inventory) {
+                invwdgs.add((Inventory) wdg);
+            }
+        }
+
+        return invwdgs;
 
     }
 
@@ -1431,6 +1519,10 @@ public class Game extends Widget {
         return waitForCursor("gfx/hud/curs/hand", timeoutMillisecs);
     }
 
+    private boolean waitForForkCursor(long timeoutMillisecs) {
+        return waitForCursor("gfx/hud/curs/eat", timeoutMillisecs);
+    }
+
     private boolean waitForCursor(String cursorName, long timeoutMillisecs) {
 
         long millisecsPassed = 0;
@@ -1542,6 +1634,25 @@ public class Game extends Widget {
         }
 
         return null;
+
+    }
+
+    private boolean activateFeast() {
+
+        Window tablewnd = gameui().getwnd("Table");
+        if (tablewnd == null) {
+            return false;
+        }
+
+        for (Widget wdg = tablewnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof Button) {
+                Button btn = (Button) wdg;
+                btn.wdgmsg("activate");
+                return true;
+            }
+        }
+
+        return false;
 
     }
 
