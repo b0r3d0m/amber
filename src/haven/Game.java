@@ -1449,11 +1449,11 @@ public class Game extends Widget {
                 return false;
             }
 
-            curs = ui.root.getcurs(c);
+            curs = ui.root.getcurs();
 
         } while (curs == null || !curs.name.equals(cursorName));
 
-        return false;
+        return true;
 
     }
 
