@@ -45,6 +45,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory 
     UI ui;
     public static UI lui;
     boolean inited = false;
+    boolean renderingEnabled = true;
     public static int w, h;
     public boolean bgmode = false;
     public static long bgfd = Utils.getprefi("bghz", 200);
@@ -125,6 +126,7 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory 
 		    dump.reset();
 		    gl = dump;
 		    */
+
                 if (inited)
                     redraw(gl);
             }
@@ -558,7 +560,15 @@ public class HavenPanel extends GLCanvas implements Runnable, Console.Directory 
     public void run() {
         try {
             Thread drawthread = new HackThread(drawfun, "Render thread");
-            drawthread.start();
+
+            GameUI.eval.addTaskToQueue(() -> {
+                Set<Map.Entry<String, Object>> options = (Set<Map.Entry<String, Object>>) GameUI.eval.call("onClientStarted");
+                renderingEnabled = (boolean) Utils.getEntryValue(options, "renderingEnabled");
+                if (renderingEnabled) {
+                    drawthread.start();
+                }
+            });
+
             synchronized (drawfun) {
                 while (state == null)
                     drawfun.wait();
