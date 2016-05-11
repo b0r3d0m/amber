@@ -1093,6 +1093,19 @@ public class Game extends Widget {
 
     }
 
+    public Rect getCharInvSize() {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
+        int width = charinvwdg.sz.x / 33;
+        int height = charinvwdg.sz.y / 33;
+        return new Rect(width, height);
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
@@ -1134,6 +1147,18 @@ public class Game extends Widget {
 
         public int shp;
         public int hhp;
+
+    }
+
+    public static class Rect {
+
+        public Rect(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        public int width;
+        public int height;
 
     }
 
