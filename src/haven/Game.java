@@ -1106,6 +1106,61 @@ public class Game extends Widget {
 
     }
 
+    public int[][] getCharInvCellsUsageMatrix() {
+
+        Inventory charinvwdg = getCharInventoryWidget();
+        if (charinvwdg == null) {
+            return null;
+        }
+
+        List<WItem> charinvwitms = getCharInventoryWItems();
+        if (charinvwitms == null) {
+            return null;
+        }
+
+        Coord cellsz = new Coord(33, 33);
+
+        int[][] used = new int[charinvwdg.sz.x / cellsz.x][charinvwdg.sz.y / cellsz.y];
+
+        for (WItem witm : charinvwitms) {
+
+            Coord topLeftCoords = new Coord(witm.c.x / 33, witm.c.y / 33);
+            Coord bottomRightCoords = new Coord(
+                    (witm.c.x + witm.sz.x - 2) / 33,
+                    (witm.c.y + witm.sz.y - 2) / 33
+            );
+            for (int x = topLeftCoords.x; x <= bottomRightCoords.x; ++x) {
+                for (int y = topLeftCoords.y; y <= bottomRightCoords.y; ++y) {
+                    used[x][y] = 1;
+                }
+            }
+
+        }
+
+        return used;
+
+    }
+
+    public int getFreeCharInvCellsCount() {
+
+        int[][] charInvCellsUsageMatrix = getCharInvCellsUsageMatrix();
+        if (charInvCellsUsageMatrix == null) {
+            return -1;
+        }
+
+        int freeCharInvCellsCount = 0;
+        for (int x = 0; x < charInvCellsUsageMatrix.length; ++x) {
+            for (int y = 0; y < charInvCellsUsageMatrix[0].length; ++y) {
+                if (charInvCellsUsageMatrix[x][y] == 0) {
+                    ++freeCharInvCellsCount;
+                }
+            }
+        }
+
+        return freeCharInvCellsCount;
+
+    }
+
     /////////////////////////////
     // API-related classes
     /////////////////////////////
