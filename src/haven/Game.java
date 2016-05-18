@@ -1,6 +1,8 @@
 package haven;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 
 public class Game extends Widget {
@@ -971,6 +973,74 @@ public class Game extends Widget {
         }
 
         return 0.0;
+
+    }
+
+    public Integer getFuelLevel(long id, String windowName) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return null;
+        }
+
+        synchronized (ui.fmAutoSelName) {
+            ui.fmAutoSelName = "Open";
+            ui.fmAutoTime = System.currentTimeMillis();
+        }
+
+        if (!mapObjectRightClick(id)) {
+            return null;
+        }
+
+        Window wnd = waitForWindow(windowName, 5000);
+        if (wnd == null) {
+            return null;
+        }
+
+        for (Widget wdg = wnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof VMeter) {
+                VMeter vm = (VMeter) wdg;
+                if (vm.cl.equals(new Color(255, 128, 0))) {
+                    return vm.amount;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    public Integer getWaterLevel(long id, String windowName) {
+
+        Gob gob = findGobWithId(id);
+        if (gob == null) {
+            return null;
+        }
+
+        synchronized (ui.fmAutoSelName) {
+            ui.fmAutoSelName = "Open";
+            ui.fmAutoTime = System.currentTimeMillis();
+        }
+
+        if (!mapObjectRightClick(id)) {
+            return null;
+        }
+
+        Window wnd = waitForWindow(windowName, 5000);
+        if (wnd == null) {
+            return null;
+        }
+
+        for (Widget wdg = wnd.lchild; wdg != null; wdg = wdg.prev) {
+            if (wdg instanceof VMeter) {
+                VMeter vm = (VMeter) wdg;
+                if (vm.cl.equals(new Color(71, 101, 153))) {
+                    return vm.amount;
+                }
+            }
+        }
+
+        return null;
 
     }
 
