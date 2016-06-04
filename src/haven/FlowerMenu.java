@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.util.*;
 
 import static java.lang.Math.PI;
 
@@ -95,7 +96,15 @@ public class FlowerMenu extends Widget {
 
     public class Opening extends NormAnim {
         Opening() {
-            super(0.15);
+            super(Config.instantflowermenu ? 0 : 0.15);
+
+            List<String> options = new ArrayList<String>();
+            for (Petal opt : opts) {
+                options.add(opt.name);
+            }
+            GameUI.eval.addTaskToQueue(() -> {
+                GameUI.eval.call("onFlowerMenuOpen", new Object[] { options.toArray(new String[options.size()]) });
+            });
         }
 
         public void ntick(double s) {
@@ -103,9 +112,11 @@ public class FlowerMenu extends Widget {
             Petal harvest = null;
             Petal eat = null;
             Petal split = null;
+            Petal drink = null;
             for (Petal p : opts) {
                 p.move(p.ta + ((1 - s) * PI), p.tr * s);
                 p.a = s;
+
                 if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Pick")))
                     pick = p;
                 else if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Harvest")))
@@ -114,6 +125,8 @@ public class FlowerMenu extends Widget {
                     eat = p;
                 else if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Split")))
                     split = p;
+                else if (p.name.equals(Resource.getLocString(Resource.l10nFlower, "Drink")))
+                    drink = p;
             }
             if (Config.autopick && pick != null && s == 1.0)
                 choose(pick);
@@ -123,6 +136,8 @@ public class FlowerMenu extends Widget {
                 choose(eat);
             else if (Config.autosplit && split != null && s == 1.0)
                 choose(split);
+            else if (Config.autodrink && drink != null && s == 1.0)
+                choose(drink);
         }
     }
 
@@ -156,7 +171,7 @@ public class FlowerMenu extends Widget {
 
     public class Cancel extends NormAnim {
         Cancel() {
-            super(0.20);
+            super(Config.instantflowermenu ? 0 : 0.20);
         }
 
         public void ntick(double s) {
@@ -286,5 +301,16 @@ public class FlowerMenu extends Widget {
         } else {
             wdgmsg("cl", option.num, ui.modflags());
         }
+    }
+
+    public boolean chooseoptwithname(String option) {
+        for (Petal opt : opts) {
+            if (opt.name.equals(option)) {
+                wdgmsg("cl", opt.num, ui.modflags());
+                return true;
+            }
+        }
+
+        return false;
     }
 }

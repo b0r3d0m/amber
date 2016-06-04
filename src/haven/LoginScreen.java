@@ -30,6 +30,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 
+import java.util.*;
+
 public class LoginScreen extends Widget {
     Login cur;
     Text error;
@@ -58,12 +60,49 @@ public class LoginScreen extends Widget {
         GameUI.swimon = false;
         GameUI.trackon = false;
         GameUI.crimeon = false;
+
+        // The `LoginScreen` should be added to its parent before calling `wdgmsg` function with the "login" action,
+        // so let's pretend that 100 milliseconds is enough for that
+        GameUI.eval.addDelayedTask(() -> {
+
+            Set<Map.Entry<String, Object>> credentials = (Set<Map.Entry<String, Object>>) GameUI.eval.call("onLogin");
+            String login = (String) Utils.getEntryValue(credentials, "login");
+            String password = (String) Utils.getEntryValue(credentials, "password");
+
+            cur = new Credentials(login, password);
+            wdgmsg("login", cur.data());
+
+        }, 100);
     }
 
     private static abstract class Login extends Widget {
         abstract Object[] data();
 
         abstract boolean enter();
+    }
+
+    private class Credentials extends Login {
+
+        String login;
+        String password;
+
+        public Credentials(String login, String password) {
+
+            this.login = login;
+            this.password = password;
+
+            LoginScreen.this.add(this);
+
+        }
+
+        Object[] data() {
+            return (new Object[]{new AuthClient.NativeCred(login, password), false});
+        }
+
+        boolean enter() {
+            return !login.isEmpty() && !password.isEmpty();
+        }
+
     }
 
     private class Pwbox extends Login {

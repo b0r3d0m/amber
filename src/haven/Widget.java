@@ -1001,6 +1001,14 @@ public class Widget {
         }
     }
 
+    public Resource getcurs() {
+        try {
+            return ((cursor == null) ? null : cursor.get());
+        } catch (Loading l) {
+            return (null);
+        }
+    }
+
     @Deprecated
     public Object tooltip(Coord c, boolean again) {
         return (null);

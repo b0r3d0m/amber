@@ -26,6 +26,7 @@
     <javac srcdir="src" destdir="build/classes" debug="on"
 	   source="1.8" target="1.8" includeantruntime="no">
       <classpath>
+    <pathelement path="lib/rhino-1.7.7.jar" />
 	<pathelement path="lib/jogl.jar" />
 	<pathelement path="lib/gluegen-rt.jar" />
 	<pathelement path="lib/jglob.jar" />
@@ -58,7 +59,7 @@
       <fileset dir="build/classes-lib" />
       <manifest>
 	<attribute name="Main-Class" value="haven.MainFrame" />
-	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar builtin-res.jar hafen-res.jar amber-res.jar l10n.jar" />
+	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar builtin-res.jar hafen-res.jar amber-res.jar l10n.jar rhino-1.7.7.jar" />
       </manifest>
     </jar>
     <chmod file="build/hafen.jar" perm="a+x" />
@@ -80,6 +81,7 @@
   <target name="jars" depends="build-env, jar, res-jar, l10n-jar">
     <copy todir="build">
       <fileset dir="lib">
+    <include name="rhino-1.7.7.jar" />
 	<include name="jogl.jar" />
 	<include name="gluegen-rt.jar" />
 	<include name="hafen-res.jar" />

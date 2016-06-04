@@ -59,6 +59,15 @@ public class Charlist extends Widget {
         this.height = height;
         y = 0;
         setcanfocus(true);
+
+        // It seems that there's no easy way to check whether all characters were loaded,
+        // so let's just call `onCharSelect` function after few seconds
+        GameUI.eval.addDelayedTask(() -> {
+            String charName = (String) GameUI.eval.call("onCharSelect");
+
+            wdgmsg("play", charName);
+        }, 3000);
+
     }
 
     protected void added() {

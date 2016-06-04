@@ -81,7 +81,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private boolean crimeautotgld = false;
     private boolean trackautotgld = false;
     public FBelt fbelt;
+    public CraftHistoryBelt histbelt;
     private ErrorSysMsgCallback errmsgcb;
+    public static Evaluator eval = new Evaluator("script.js");
+    public static Game game = new Game();
+    private boolean gameloadedcalled = false;
 
     public abstract class Belt extends Widget {
         public Belt(Coord sz) {
@@ -194,6 +198,22 @@ public class GameUI extends ConsoleHost implements Console.Directory {
         add(fbelt, Utils.getprefc("fbelt_c", new Coord(20, 200)));
         if (!Config.fbelt)
             fbelt.hide();
+
+        add(game, new Coord(0, 0));
+
+        if (!gameloadedcalled) {
+            // It seems that there's no easy way to check whether the game was fully loaded,
+            // so let's just call `onGameLoaded` function after few seconds
+            GameUI.eval.addDelayedTask(() -> {
+                GameUI.eval.call("onGameLoaded", new Object[] { GameUI.game });
+            }, 10000);
+            gameloadedcalled = true;
+        }
+
+        histbelt = new CraftHistoryBelt(Utils.getprefb("histbelt_vertical", true));
+        add(histbelt, Utils.getprefc("histbelt_c", new Coord(70, 200)));
+        if (!Config.histbelt)
+            histbelt.hide();
     }
 
     /* Ice cream */
@@ -949,11 +969,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             return true;
         } else if (ev.isAltDown() && ev.getKeyCode() == KeyEvent.VK_Z) {
             quickslots.drop(QuickSlotsWdg.lc, Coord.z);
-            quickslots.mousedown(QuickSlotsWdg.lc, 1);
+            quickslots.simulateclick(QuickSlotsWdg.lc);
             return true;
         } else if (ev.isAltDown() && ev.getKeyCode() == KeyEvent.VK_X) {
             quickslots.drop(QuickSlotsWdg.rc, Coord.z);
-            quickslots.mousedown(QuickSlotsWdg.rc, 1);
+            quickslots.simulateclick(QuickSlotsWdg.rc);
             return true;
         } else if (ev.isAltDown() && ev.getKeyCode() == KeyEvent.VK_S) {
             HavenPanel.needtotakescreenshot = true;
@@ -989,7 +1009,23 @@ public class GameUI extends ConsoleHost implements Console.Directory {
             Config.tilecenter = !Config.tilecenter;
             Utils.setprefb("tilecenter", Config.tilecenter);
             msg("Tile centering is now turned " + (Config.tilecenter ? "on." : "off."), Color.WHITE);
+        } else if (ev.isControlDown() && ev.getKeyCode() == KeyEvent.VK_D) {
+            Config.showminerad = !Config.showminerad;
+            Utils.setprefb("showminerad", Config.showminerad);
+            return true;
+        } else if (ev.isShiftDown() && ev.getKeyCode() == KeyEvent.VK_D) {
+            Config.showfarmrad = !Config.showfarmrad;
+            Utils.setprefb("showfarmrad", Config.showfarmrad);
+            return true;
+        } else if (!ev.isShiftDown() && ev.getKeyCode() == KeyEvent.VK_W) {
+            synchronized (ui.fmAutoSelName) {
+                ui.fmAutoSelName = "Drink";
+                ui.fmAutoTime = System.currentTimeMillis();
+            }
+            maininv.drink(100);
+            return true;
         }
+
         return (super.globtype(key, ev));
     }
 

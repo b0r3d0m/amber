@@ -63,6 +63,7 @@ public class LocalMiniMap extends Widget {
     private final static Tex treeicn = Text.renderstroked("\u25B2", Color.CYAN, Color.BLACK, bushf).tex();
     private Map<Color, Tex> xmap = new HashMap<Color, Tex>(6);
     public static Coord plcrel = null;
+    public final HashSet<Long> evalgobs = new HashSet<Long>();
 
     private static class MapTile {
         public MCache.Grid grid;
@@ -292,6 +293,39 @@ public class LocalMiniMap extends Widget {
                     if (res == null)
                         continue;
 
+                    final String resBaseName = res.basename();
+
+                    if (CurioStudyTimes.curios.containsKey(resBaseName)) {
+
+                        long gobId = gob.id;
+                        if (!evalgobs.contains(gobId)) {
+                            evalgobs.add(gobId);
+
+                            Coord curioCoords = gob.rc;
+
+                            GameUI.eval.addTaskToQueue(() -> {
+                                GameUI.eval.call("onCurioFound", new Object[] { gobId, resBaseName, curioCoords });
+                            });
+
+                        }
+                    }
+
+                    if (res.name.startsWith("gfx/kritter/")) {
+
+                        long gobId = gob.id;
+                        if (!evalgobs.contains(gobId)) {
+                            evalgobs.add(gobId);
+
+                            Coord creatureCoords = gob.rc;
+
+                            GameUI.eval.addTaskToQueue(() -> {
+                                GameUI.eval.call("onCreatureFound", new Object[] { gobId, resBaseName, creatureCoords });
+                            });
+
+                        }
+
+                    }
+
                     if ("body".equals(res.basename()) && gob.id != mv.player().id) {
                         boolean ispartymember = false;
                         synchronized (ui.sess.glob.party.memb) {
@@ -307,6 +341,19 @@ public class LocalMiniMap extends Widget {
                                 g.chcolor(kininfo != null ? BuddyWnd.gc[kininfo.group] : Color.WHITE);
                                 g.fellipse(pc, new Coord(4, 4));
                                 g.chcolor();
+                            }
+
+                            long gobId = gob.id;
+                            if (!evalgobs.contains(gobId)) {
+                                evalgobs.add(gobId);
+
+                                boolean iskin = kininfo != null;
+                                Coord playerCoords = gob.rc;
+
+                                GameUI.eval.addTaskToQueue(() -> {
+                                    GameUI.eval.call("onPlayerFound", new Object[] { gobId, iskin, playerCoords });
+                                });
+
                             }
 
                             if ((Config.alarmunknown || Config.autohearth) && kininfo == null) {
